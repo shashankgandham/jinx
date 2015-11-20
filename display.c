@@ -12,7 +12,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Timetable generator.  If not, see <http://www.gnu.org/licenses/>.
-*/
+    */
 #include <menu.h>
 #include "library.h"
 
@@ -25,8 +25,8 @@ int n_main_menu, n_database_menu, n_data_menu,n_edit_menu, n_slot_menu;
 void remove_menu(int n) {
 	int i;
 	unpost_menu(menu);
-        free_menu(menu);
-        for(i = 0; i < n; ++i)
+	free_menu(menu);
+	for(i = 0; i < n; ++i)
 		free_item(items[i]);
 	endwin();
 	clear();
@@ -75,7 +75,7 @@ int get_menu_choices() {
 		}
 		i++;
 	}
-		fclose(fp);
+	fclose(fp);
 	return i;
 }
 int main_menu() {
@@ -83,18 +83,18 @@ int main_menu() {
 	n_main_menu = get_menu_choices();
 	keypad(stdscr, TRUE);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
-        items = (ITEM **)calloc(n_main_menu + 2, sizeof(ITEM *));
-        for(i = 0; i < n_main_menu; i++) {
-                items[i] = new_item(main_menu_choices[i], NULL);
+	items = (ITEM **)calloc(n_main_menu + 2, sizeof(ITEM *));
+	for(i = 0; i < n_main_menu; i++) {
+		items[i] = new_item(main_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
-        set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, "My Menu", COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -107,23 +107,23 @@ int main_menu() {
 	while((c = wgetch(win)))
 	{       
 		switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(main_menu_choice != (n_main_menu - 1))
-					main_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(main_menu_choice != (n_main_menu - 1))
+				main_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(main_menu_choice != 0)
-					main_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(main_menu_choice != 0)
+				main_menu_choice--;
+			break;
 			case 10:
-				remove_menu(n_main_menu);
-				return main_menu_choice;
+			remove_menu(n_main_menu);
+			return main_menu_choice;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -156,8 +156,8 @@ int main() {
 	int n;
 	initscr();
 	start_color();
-        cbreak();
-        noecho();
+	cbreak();
+	noecho();
 	while(1) {
 		n = main_menu();
 		if(n == n_main_menu - 1) {
@@ -178,7 +178,7 @@ void new_database_form() {
 	int y,x;	
 	start_color();
 	getmaxyx(win,y,x);
-        win = newwin(6, 40, y/3, x/3);
+	win = newwin(6, 40, y/3, x/3);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, 40, "Enter the name of database", COLOR_PAIR(1));
@@ -211,20 +211,20 @@ int show_database_menu() {
 	int x, y;	
 	start_color();
 	cbreak();
-        noecho();
+	noecho();
 	keypad(stdscr, TRUE);
-        items = (ITEM **)calloc(n_database_menu + 2, sizeof(ITEM *));
-        for(i = 0; i < n_database_menu; ++i) {
+	items = (ITEM **)calloc(n_database_menu + 2, sizeof(ITEM *));
+	for(i = 0; i < n_database_menu; ++i) {
 		items[i] = new_item(database_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
-        win = newwin(0, 0, 0, 0);
+	win = newwin(0, 0, 0, 0);
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
+	keypad(win, TRUE);
 	set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, main_menu_choices[main_menu_choice], COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -236,23 +236,23 @@ int show_database_menu() {
 	database_menu_choice = 0;
 	while((c = wgetch(win)))
 	{       switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(database_menu_choice != n_database_menu - 1)
-					database_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(database_menu_choice != n_database_menu - 1)
+				database_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(database_menu_choice != 0)
-					database_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(database_menu_choice != 0)
+				database_menu_choice--;
+			break;
 			case 10: /* Enter */
-				remove_menu(n_database_menu);
-				return database_menu_choice;
+			remove_menu(n_database_menu);
+			return database_menu_choice;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -264,7 +264,7 @@ void add_data_form() {
 	start_color();
 	int x, y;
 	getmaxyx(win,y,x);
-        win = newwin(6, 40,y/3,x/3);
+	win = newwin(6, 40,y/3,x/3);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	if(database_menu_choice == 0)
@@ -305,20 +305,20 @@ int edit_data_menu() {
 	int x, y;	
 	start_color();
 	cbreak();
-        noecho();
+	noecho();
 	keypad(stdscr, TRUE);
-        items = (ITEM **)calloc(n_edit_menu + 2, sizeof(ITEM *));
-        for(i = 0; i < n_edit_menu; ++i) {
+	items = (ITEM **)calloc(n_edit_menu + 2, sizeof(ITEM *));
+	for(i = 0; i < n_edit_menu; ++i) {
 		items[i] = new_item(edit_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
-        win = newwin(0, 0, 0, 0);
+	win = newwin(0, 0, 0, 0);
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
+	keypad(win, TRUE);
 	set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x,"Edit Menu" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -330,23 +330,23 @@ int edit_data_menu() {
 	edit_menu_choice = 0;
 	while((c = wgetch(win)))
 	{       switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(edit_menu_choice != n_edit_menu - 1)
-					edit_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(edit_menu_choice != n_edit_menu - 1)
+				edit_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(edit_menu_choice != 0)
-					edit_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(edit_menu_choice != 0)
+				edit_menu_choice--;
+			break;
 			case 10: /* Enter */
-				remove_menu(n_edit_menu);
-				return edit_menu_choice;
+			remove_menu(n_edit_menu);
+			return edit_menu_choice;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -357,7 +357,7 @@ void edit_data_form(char *database, int marker, int n) {
 	int y,x;
 	start_color();
 	getmaxyx(win,y,x);
-        win = newwin(6, 40, y/3, x/3);
+	win = newwin(6, 40, y/3, x/3);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	if(database_menu_choice == 0)
@@ -446,21 +446,21 @@ int display_data(char *database, int marker) {
 	n_data_menu+=2;
 	start_color();
 	cbreak();
-        noecho();
+	noecho();
 	keypad(stdscr, TRUE);	
-        items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
-        for(i = 0; i < n_data_menu; ++i) {
+	items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
+	for(i = 0; i < n_data_menu; ++i) {
 		items[i] = new_item(data_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
-      	win = newwin(0, 0, 0, 0);
+	win = newwin(0, 0, 0, 0);
 	int y,x;
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
-        set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
 	if(marker == TEACHER) 
 		print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
@@ -479,24 +479,24 @@ int display_data(char *database, int marker) {
 	data_menu_choice = 0;
 	while((c = wgetch(win)))
 	{       switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(data_menu_choice != n_data_menu -1)
-					data_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(data_menu_choice != n_data_menu -1)
+				data_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(data_menu_choice != 0)
-					data_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(data_menu_choice != 0)
+				data_menu_choice--;
+			break;
 			case 10: /* Enter */
-				remove_menu(n_data_menu);
-				return data_menu_choice;
-				break;
+			remove_menu(n_data_menu);
+			return data_menu_choice;
+			break;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -533,21 +533,21 @@ int add_slot_teacher(char *database) {
 	n_data_menu+=1;
 	start_color();
 	cbreak();
-        noecho();
+	noecho();
 	keypad(stdscr, TRUE);	
-        items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
-        for(i = 0; i < n_data_menu; ++i) {
+	items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
+	for(i = 0; i < n_data_menu; ++i) {
 		items[i] = new_item(data_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
-    	win = newwin(0, 0, 0, 0);
+	win = newwin(0, 0, 0, 0);
 	int y,x;
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
-        set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -559,24 +559,24 @@ int add_slot_teacher(char *database) {
 	data_menu_choice = 0;
 	while((c = wgetch(win)))
 	{       switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(data_menu_choice != n_data_menu - 1)
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(data_menu_choice != n_data_menu - 1)
 				data_menu_choice++;
-				break;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(data_menu_choice != 0)
-					data_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(data_menu_choice != 0)
+				data_menu_choice--;
+			break;
 			case 10: /* Enter */
-				remove_menu(n_data_menu);
-				return data_menu_choice;
-				break;
+			remove_menu(n_data_menu);
+			return data_menu_choice;
+			break;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -592,21 +592,21 @@ int add_slot_subject(char *database) {
 	n_data_menu+=1;
 	start_color();
 	cbreak();
-        noecho();
+	noecho();
 	keypad(stdscr, TRUE);	
-        items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
-        for(i = 0; i < n_data_menu; ++i) {
+	items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
+	for(i = 0; i < n_data_menu; ++i) {
 		items[i] = new_item(data_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);    
 	win = newwin(0, 0, 0, 0);
 	int y,x;
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
-        set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);	
 	print_in_middle(win, 1, 0, x, "Subjects" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -618,24 +618,24 @@ int add_slot_subject(char *database) {
 	data_menu_choice = 0;
 	while((c = wgetch(win)))
 	{       switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(data_menu_choice != n_data_menu -1)
-					data_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(data_menu_choice != n_data_menu -1)
+				data_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(data_menu_choice != 0)
-					data_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(data_menu_choice != 0)
+				data_menu_choice--;
+			break;
 			case 10: /* Enter */
-				remove_menu(n_data_menu);
-				return data_menu_choice;
-				break;
+			remove_menu(n_data_menu);
+			return data_menu_choice;
+			break;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -651,21 +651,21 @@ int add_slot_class(char *database) {
 	n_data_menu+=1;
 	start_color();
 	cbreak();
-        noecho();
+	noecho();
 	keypad(stdscr, TRUE);	
-        items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
-        for(i = 0; i < n_data_menu; ++i) {
+	items = (ITEM **)calloc(n_data_menu + 1, sizeof(ITEM *));
+	for(i = 0; i < n_data_menu; ++i) {
 		items[i] = new_item(data_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
 	int y, x;
 	win = newwin(0, 0, 0, 0);
-        getmaxyx(win,y,x);
-        keypad(win, TRUE);
-        set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	getmaxyx(win,y,x);
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);	
 	print_in_middle(win, 1, 0, x, "Classes" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -677,24 +677,24 @@ int add_slot_class(char *database) {
 	data_menu_choice = 0;
 	while((c = wgetch(win)))
 	{       switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(data_menu_choice != n_data_menu - 1)
-					data_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(data_menu_choice != n_data_menu - 1)
+				data_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(data_menu_choice != 0)
-					data_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(data_menu_choice != 0)
+				data_menu_choice--;
+			break;
 			case 10: /* Enter */
-				remove_menu(n_data_menu);
-				return data_menu_choice;
-				break;
+			remove_menu(n_data_menu);
+			return data_menu_choice;
+			break;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }
@@ -702,16 +702,16 @@ void add_slot_form() {
 	int teacher, subject, class, week_time = 1;	
 	char database[128];
 	strcpy(database,main_menu_choices[main_menu_choice]);
-	x:teacher = add_slot_teacher(database);
-	  if(teacher == n_data_menu - 1)
-		    return;
-	y:subject = add_slot_subject(database);
-	  if(subject == n_data_menu - 1)
-		  goto x;
-	class = add_slot_class(database);
-	  if(class == n_data_menu - 1)
-		 goto y;
-	 create_slot(database,teacher,subject,class,week_time);
+x:teacher = add_slot_teacher(database);
+  if(teacher == n_data_menu - 1)
+	  return;
+y:subject = add_slot_subject(database);
+  if(subject == n_data_menu - 1)
+	  goto x;
+  class = add_slot_class(database);
+  if(class == n_data_menu - 1)
+	  goto y;
+  create_slot(database,teacher,subject,class,week_time);
 }
 void show_slot() {
 	int n;
@@ -753,22 +753,22 @@ int display_slot() {
 	strcpy(slot_menu_choices[i + 1], "Back");
 	n_slot_menu+=2;
 	start_color();
-        cbreak();
-        noecho();
+	cbreak();
+	noecho();
 	keypad(stdscr, TRUE);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
-        items = (ITEM **)calloc(n_slot_menu + 2, sizeof(ITEM *));
-        for(i = 0; i < n_slot_menu; i++) {
-                items[i] = new_item(slot_menu_choices[i], NULL);
+	items = (ITEM **)calloc(n_slot_menu + 2, sizeof(ITEM *));
+	for(i = 0; i < n_slot_menu; i++) {
+		items[i] = new_item(slot_menu_choices[i], NULL);
 	}	
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	getmaxyx(win,y,x);
-        keypad(win, TRUE);
-        set_menu_win(menu, win);
-        set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
-        set_menu_mark(menu, " * ");
+	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, "Slots", COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -781,23 +781,23 @@ int display_slot() {
 	while((c = wgetch(win)))
 	{       
 		switch(c)
-	        {	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(slot_menu_choice != n_slot_menu - 1)
-					slot_menu_choice++;
-				break;
+		{	case KEY_DOWN:
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(slot_menu_choice != n_slot_menu - 1)
+				slot_menu_choice++;
+			break;
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(slot_menu_choice != 0)
-					slot_menu_choice--;
-				break;
+			menu_driver(menu, REQ_UP_ITEM);
+			if(slot_menu_choice != 0)
+				slot_menu_choice--;
+			break;
 			case 10: 
-				remove_menu(n_slot_menu);
-				return slot_menu_choice;
+			remove_menu(n_slot_menu);
+			return slot_menu_choice;
 			default:
-				break;
+			break;
 		}
-                wrefresh(win);
+		wrefresh(win);
 	}	
 	return -1;
 }

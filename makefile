@@ -19,3 +19,13 @@ generator.o: generator.c library.h
 	@gcc -c -g -Wall generator.c -o generator.o 
 clean :
 	@sudo rm *.o ttmaker *.dat
+
+new : remove	
+	@echo "The Program was compiled successfully and its details are :"
+	@echo "Lines Bytes Filename"
+	@wc -lc *.c *.h
+remove: jinx
+	rm *.o
+
+jinx: teacher.o batch.o subject.o room.o alloc.o main.o
+	@gcc -o jinx batch.o teacher.o subject.o room.o alloc.o main.o -lncurses -lgsl -lgslcblas -lmenu -g
