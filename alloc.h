@@ -15,6 +15,7 @@
 */
 #include <menu.h>
 #define alloc_header
+
 typedef struct alloc{
 	int teacher;
 	int subject;

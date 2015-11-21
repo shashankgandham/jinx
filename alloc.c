@@ -26,6 +26,7 @@ void remove_menu(MENU *menu, ITEM **items, int n) {
 	endwin();
 	clear();
 }
+
 void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color)
 {	int length, x, y;
 	float temp;
