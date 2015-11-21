@@ -35,7 +35,7 @@ room get_room(char *database, int n);
 int room_number(char *database);
 /*Returns the number of rooms in the database */
 
-alloc *find_info(char *database, int index);
+alloc *find_room_info(char *database, int index);
 /*This function returns a list of subjects taught by the room */ 
 
 int sort_room(char *database , int(*compare )(const void *x ,const void *y));

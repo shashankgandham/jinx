@@ -36,7 +36,7 @@ batch get_batch(char *database, int n);
 int batch_number(char *database);
 /*Returns the number of batchs in the database */
 
-alloc *find_info(char *database, int index);
+alloc *find_batch_info(char *database, int index);
 /*This function returns a list of subjects taught by the batch */ 
 
 int sort_batch(char *database , int(*compare )(const void *x ,const void *y));

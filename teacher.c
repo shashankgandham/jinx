@@ -1,11 +1,11 @@
-/*  This file is part of Jinx originally written by Shashank Gandham.
+/*  This file is part of Jinx originally written by Shashank gandham.
 
-    Jinx is free software: you can redistribute it and/or modify
+    Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
+    the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    Jinx is distributed in the hope that it will be useful,
+    Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -13,6 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 #include "teacher.h"
 #include <stdio.h>
@@ -117,7 +118,7 @@ int teacher_number(char *database) {
 	fclose(fp);
 	return n;
 }
-alloc *find_info(char *database, int index){
+alloc *find_teacher_info(char *database, int index){
 	alloc *xalloc;
 	xalloc = (alloc *)malloc(sizeof(alloc));
 	return xalloc;

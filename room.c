@@ -115,7 +115,7 @@ int room_number(char *database) {
 	fclose(fp);
 	return n;
 }
-alloc *find_info(char *database, int index){
+alloc *find_room_info(char *database, int index){
 
 }
 int sort_room(char *database , int(*compare)(const void *x ,const void *y)){

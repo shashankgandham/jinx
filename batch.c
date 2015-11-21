@@ -115,7 +115,7 @@ int batch_number(char *database) {
 	fclose(fp);
 	return n;
 }
-alloc *find_info(char *database, int index){
+alloc *find_batch_info(char *database, int index){
 
 }
 int sort_batch(char *database , int(*compare)(const void *x ,const void *y)){

@@ -36,7 +36,7 @@ teacher get_teacher(char *database, int n);
 int teacher_number(char *database);
 /*Returns the number of teachers in the database */
 
-alloc *find_info(char *database, int index);
+alloc *find_teacher_info(char *database, int index);
 /*This function returns a list of subjects taught by the teacher */ 
 
 int sort_teacher(char *database , int(*compare )(const void *x ,const void *y));
