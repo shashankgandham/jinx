@@ -22,30 +22,43 @@
 #include <string.h>
 #include <menu.h>
 #include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 
 int new_database(char *name) {
-	FILE *fp;
-	char database[128][128];
-	fp = fopen("database.txt","r");
-	int i = 1, d;
-	strcpy(database[0],name);
-	while((d = fscanf(fp," %[^\n]s",database[i])) && d != EOF ) {
-		i++;
-	}
-	d = i + 1;
-	if(i == 128)
-       		return -1;
-	else {
-		fclose(fp);
-		remove("database.txt");
-		fp = fopen("database.txt","w");
-		for(i = 0; i < d; i++)
-			fprintf(fp,"%s\n",database[i]);
-		
+	FILE *fp, *gp;
+	char database[128];
+	int d;
+	fp = fopen("Database/database.txt","r");
+	gp = fopen("Database/.database_temp.txt","w");
+	fprintf(gp,"%s\n",name);
+	while((d = fscanf(fp," %[^\n]s",database)) && d != EOF ) {
+		fprintf(gp,"%s\n",database);
 	}
 	fclose(fp);
+	fclose(gp);
+	remove("Database/database.txt");
+	rename("Database/.database_temp.txt","Database/database.txt");	
 	return 1;
 }
+int remove_database(char *data) {
+	FILE *fp, *gp;
+	char database[128];	
+	int d, i = 0;
+	fp = fopen("Database/database.txt","r");
+	gp = fopen("Database/.database_temp.txt","w");
+	while((d = fscanf(fp," %[^\n]s",database)) && d != EOF ) {
+		if(strcmp(database,data))
+			fprintf(gp,"%s\n",database);
+		i++;
+	}
+	fclose(fp);
+	fclose(gp);
+	remove("Database/database.txt");
+	rename("Database/.database_temp.txt","Database/database.txt");	
+	return 1;
+}
+
 void new_database_form() {
 	refresh();
 	char name[128];
@@ -143,11 +156,15 @@ void database_menu(char *database) {
 		choice = show_database_menu(database);
 		if(choice == n - 1)
 			return;
+		if(choice == n - 2) {
+			remove_database(database);
+			return;
+		}
 	}
 }
 void get_database(int choice, char *choices) {
 	FILE *fp;
-	fp = fopen("database.txt","r");
+	fp = fopen("Database/database.txt","r");
 	int i;
 	i = 0;
 	while(fscanf(fp," %[^\n]s",choices)!= EOF) {
@@ -159,17 +176,18 @@ void get_database(int choice, char *choices) {
 }
 int database_number() {
 	FILE *fp;
-	fp = fopen("database.txt","r");
+	mkdir("Database",S_IRWXU);
+	fp = fopen("Database/database.txt","r");
 	int i;
 	char choices[128];
 	if(fp == NULL) {
-		fp = fopen("database.txt","w");
+		fp = fopen("Database/database.txt","w");
 		fprintf(fp,"New Database\n");
 		fprintf(fp,"Exit\n");
 		fclose(fp);
 		return 0;
 	}
-	fp = fopen("database.txt","r");
+	fp = fopen("Database/database.txt","r");
 	i = 0;
 	while(fscanf(fp," %[^\n]s",choices)!= EOF) {
 		i++;
@@ -239,7 +257,6 @@ int main_menu() {
 	}	
 	return -1;
 }
-
 int main() {
 	int choice, n;
 	char database[128];

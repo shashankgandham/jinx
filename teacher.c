@@ -44,47 +44,52 @@ int add_teacher(char *database, teacher *xteacher) {
 }
 int remove_teacher(char *database, int index){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
+	int n, i;
+	char file[16],temp_file[32];
 	n = teacher_number(database);
-	teacher *xteacher;
-	xteacher = (teacher *)malloc(sizeof(teacher) * n);
-	for(i = 0; i < n; i++) {
-		if(i != index) {
-			xteacher[k] = get_teacher(database, n-1);
-			k++;
-		}
-	}
+	teacher xteacher;	
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_teacher");
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_teacher");
-	fp = fopen(file,"a");
-	for(i = 0; i < n - 1; i++)
-		fprintf(fp,"%d %d %s\n",xteacher[i].index,xteacher[i].week_time, xteacher[i].name);
+	fp = fopen(temp_file,"w");
+	for(i = 0; i < n; i++) {
+		if(i != index) {
+			xteacher = get_teacher(database, i);
+			fprintf(fp,"%d %d %s\n",xteacher.index,xteacher.week_time, xteacher.name);
+		}
+	}
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xteacher);
 	return 0;
 }
 int edit_teacher(char *database, int index, char *name){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
-	n = teacher_number(database);
-	teacher *xteacher;
-	xteacher = (teacher *)malloc(sizeof(teacher) * n);
-	for(i = 0; i < n; i++) {
-		xteacher[k] = get_teacher(database, n-1);
-		k++;
-	}
+	int n, i;
+	char file[16], temp_file[32];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_teacher");
-	strcpy(xteacher[index].name, name);
-	fp = fopen(file,"a");
-	for(i = 0; i < n; i++)
-		fprintf(fp,"%d %d %s\n",xteacher[i].index,xteacher[i].week_time, xteacher[i].name);
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_teacher");
+	fp = fopen(temp_file,"a");
+	n = teacher_number(database);
+	teacher xteacher;
+	for(i = 0; i < n; i++) {
+		xteacher = get_teacher(database, n-1);
+		if(i!=index)
+			strcpy(xteacher.name, name);
+		fprintf(fp,"%d %d %s\n",xteacher.index,xteacher.week_time, xteacher.name);
+	}
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xteacher);
 	return 0;
 }
 teacher get_teacher(char *database, int index) {
@@ -197,6 +202,35 @@ int teacher_menu(char *database){
 
 }
 int teacher_form(char *database){
-
+	refresh();
+	teacher xteacher;
+	echo();
+	WINDOW *win;
+	int y,x;	
+	start_color();
+	getmaxyx(stdscr,y,x);
+	win = newwin(6, 40, y/3, x/3);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Enter the name of database", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw(" %[^\n]s",xteacher.name);
+	clear();
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Enter the weekly hours for the teacher", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw("%d",xteacher.week_time);
+	add_teacher(database, &xteacher);
+	refresh();
+	endwin();
+	clear();
 	return 0;
 }
