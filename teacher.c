@@ -67,7 +67,7 @@ int remove_teacher(char *database, int index){
 	fclose(fp);
 	return 0;
 }
-int edit_teacher(char *database, int index, char *name){
+int edit_teacher(char *database, int index, teacher *xteacher){
 	FILE *fp;
 	int n, i;
 	char file[16], temp_file[32];
@@ -80,12 +80,13 @@ int edit_teacher(char *database, int index, char *name){
 	strcat(temp_file, "_teacher");
 	fp = fopen(temp_file,"a");
 	n = teacher_number(database);
-	teacher xteacher;
+	teacher yteacher;
 	for(i = 0; i < n; i++) {
-		xteacher = get_teacher(database, n-1);
+		yteacher = get_teacher(database, n-1);
 		if(i!=index)
-			strcpy(xteacher.name, name);
-		fprintf(fp,"%d %d %s\n",xteacher.index,xteacher.week_time, xteacher.name);
+			fprintf(fp,"%d %d %s\n",yteacher.index,yteacher.week_time, yteacher.name);
+		else
+			fprintf(fp,"%d %d %s\n",xteacher->index,xteacher->week_time, xteacher->name);
 	}
 	remove(file);
 	rename(temp_file,file);

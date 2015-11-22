@@ -29,7 +29,7 @@ int add_batch(char *database, batch *xbatch);
 int remove_batch(char *database, int index);
 /*This function removes the batch from the given database */
 
-int edit_batch(char *database, int index, char *name);
+int edit_batch(char *database, int index, batch *xbatch);
 /*This function edits the name of the batch from the given database */
 batch get_batch(char *database, int n);
 /* Returns the nth batch in the database , irrespective of the index*/

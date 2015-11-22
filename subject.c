@@ -41,47 +41,53 @@ int add_subject(char *database, subject *xsubject) {
 }
 int remove_subject(char *database, int index){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
+	int n, i;
+	char file[16],temp_file[32];
 	n = subject_number(database);
-	subject *xsubject;
-	xsubject = (subject *)malloc(sizeof(subject) * n);
+	subject xsubject;	
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_subject");
+	strcpy(file, "Database/");
+	strcat(file, database);
+	strcat(file, "_subject");
+	fp = fopen(temp_file,"w");
 	for(i = 0; i < n; i++) {
 		if(i != index) {
-			xsubject[k] = get_subject(database, n-1);
-			k++;
+			xsubject = get_subject(database, i);
+			fprintf(fp,"%d %d %s\n",xsubject.index,xsubject.week_time, xsubject.name);
 		}
 	}
-	strcpy(file, "Database/");
-	strcat(file, database);
-	strcat(file, "_subject");
-	fp = fopen(file,"a");
-	for(i = 0; i < n - 1; i++)
-		fprintf(fp,"%d %d %d %s\n",xsubject[i].index,xsubject[i].slot_len,xsubject->slot_per_week, xsubject[i].name);
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xsubject);
 	return 0;
 }
-int edit_subject(char *database, int index, char *name){
+int edit_subject(char *database, int index, subject *xsubject){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
-	n = subject_number(database);
-	subject *xsubject;
-	xsubject = (subject *)malloc(sizeof(subject) * n);
-	for(i = 0; i < n; i++) {
-		xsubject[k] = get_subject(database, n-1);
-		k++;
-	}
+	int n, i;
+	char file[16], temp_file[32];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_subject");
-	strcpy(xsubject[index].name, name);
-	fp = fopen(file,"a");
-	for(i = 0; i < n; i++)
-		fprintf(fp,"%d %d %d %s\n",xsubject[i].index,xsubject[i].slot_len,xsubject->slot_per_week, xsubject[i].name);
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_subject");
+	fp = fopen(temp_file,"a");
+	n = subject_number(database);
+	subject ysubject;
+	for(i = 0; i < n; i++) {
+		ysubject = get_subject(database, n-1);
+		if(i!=index)
+			fprintf(fp,"%d %d %d %s\n",ysubject.index,ysubject.slot_len,ysubject.slot_per_week,ysubject.name);
+		else
+			fprintf(fp,"%d %d %d %s\n",xsubject->index,xsubject->slot_len,xsubject->slot_per_week, xsubject->name);
+	}
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xsubject);
 	return 0;
 }
 subject get_subject(char *database, int index) {

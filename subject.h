@@ -29,7 +29,7 @@ int add_subject(char *database, subject *xsubject);
 int remove_subject(char *database, int index);
 /*This function removes the subject from the given database */
 
-int edit_subject(char *database, int index, char *name);
+int edit_subject(char *database, int index, subject *xsubject);
 /*This function edits the name of the subject from the given database */
 subject get_subject(char *database, int n);
 /* Returns the nth subject in the database , irrespective of the index*/

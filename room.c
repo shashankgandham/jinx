@@ -41,47 +41,53 @@ int add_room(char *database, room *xroom) {
 }
 int remove_room(char *database, int index){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
+	int n, i;
+	char file[16],temp_file[32];
 	n = room_number(database);
-	room *xroom;
-	xroom = (room *)malloc(sizeof(room) * n);
+	room xroom;	
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_room");
+	strcpy(file, "Database/");
+	strcat(file, database);
+	strcat(file, "_room");
+	fp = fopen(temp_file,"w");
 	for(i = 0; i < n; i++) {
 		if(i != index) {
-			xroom[k] = get_room(database, n-1);
-			k++;
+			xroom = get_room(database, i);
+			fprintf(fp,"%d %d %s\n",xroom.index,xroom.capacity, xroom.name);
 		}
 	}
-	strcpy(file, "Database/");
-	strcat(file, database);
-	strcat(file, "_room");
-	fp = fopen(file,"a");
-	for(i = 0; i < n - 1; i++)
-		fprintf(fp,"%d %d %s\n",xroom[i].index,xroom[i].capacity, xroom[i].name);
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xroom);
 	return 0;
 }
-int edit_room(char *database, int index, char *name){
+int edit_room(char *database, int index, room *xroom){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
-	n = room_number(database);
-	room *xroom;
-	xroom = (room *)malloc(sizeof(room) * n);
-	for(i = 0; i < n; i++) {
-		xroom[k] = get_room(database, n-1);
-		k++;
-	}
+	int n, i;
+	char file[16], temp_file[32];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_room");
-	strcpy(xroom[index].name, name);
-	fp = fopen(file,"a");
-	for(i = 0; i < n; i++)
-		fprintf(fp,"%d %d %s\n",xroom[i].index,xroom[i].capacity, xroom[i].name);
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_room");
+	fp = fopen(temp_file,"a");
+	n = room_number(database);
+	room yroom;
+	for(i = 0; i < n; i++) {
+		yroom = get_room(database, n-1);
+		if(i!=index)
+			fprintf(fp,"%d %d %s\n",yroom.index,yroom.capacity, yroom.name);
+		else
+			fprintf(fp,"%d %d %s\n",xroom->index,xroom->capacity, xroom->name);
+	}
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xroom);
 	return 0;
 }
 room get_room(char *database, int index) {

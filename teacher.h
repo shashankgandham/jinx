@@ -29,7 +29,7 @@ int add_teacher(char *database, teacher *xteacher);
 int remove_teacher(char *database, int index);
 /*This function removes the teacher from the given database */
 
-int edit_teacher(char *database, int index, char *name);
+int edit_teacher(char *database, int index, teacher *xteacher);
 /*This function edits the name of the teacher from the given database */
 teacher get_teacher(char *database, int n);
 /* Returns the nth teacher in the database , irrespective of the index*/

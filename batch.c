@@ -41,47 +41,53 @@ int add_batch(char *database, batch *xbatch) {
 }
 int remove_batch(char *database, int index){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
+	int n, i;
+	char file[16],temp_file[32];
 	n = batch_number(database);
-	batch *xbatch;
-	xbatch = (batch *)malloc(sizeof(batch) * n);
+	batch xbatch;	
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_batch");
+	strcpy(file, "Database/");
+	strcat(file, database);
+	strcat(file, "_batch");
+	fp = fopen(temp_file,"w");
 	for(i = 0; i < n; i++) {
 		if(i != index) {
-			xbatch[k] = get_batch(database, n-1);
-			k++;
+			xbatch = get_batch(database, i);
+			fprintf(fp,"%d %d %d %s\n",xbatch.index,xbatch.parent,xbatch.strength, xbatch.name);
 		}
 	}
-	strcpy(file, "Database/");
-	strcat(file, database);
-	strcat(file, "_batch");
-	fp = fopen(file,"a");
-	for(i = 0; i < n - 1; i++)
-		fprintf(fp,"%d %d %d %s\n",xbatch[i].index,xbatch[i].parent, xbatch[i].strength, xbatch[i].name);
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xbatch);
 	return 0;
 }
-int edit_batch(char *database, int index, char *name){
+int edit_batch(char *database, int index, batch *xbatch){
 	FILE *fp;
-	int n, i , k = 0;
-	char file[16];
-	n = batch_number(database);
-	batch *xbatch;
-	xbatch = (batch *)malloc(sizeof(batch) * n);
-	for(i = 0; i < n; i++) {
-		xbatch[k] = get_batch(database, n-1);
-		k++;
-	}
+	int n, i;
+	char file[16], temp_file[32];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_batch");
-	strcpy(xbatch[index].name, name);
-	fp = fopen(file,"a");
-	for(i = 0; i < n; i++)
-		fprintf(fp,"%d %d %d %s\n",xbatch[i].index,xbatch[i].parent, xbatch[i].strength, xbatch[i].name);
+	strcpy(temp_file, "Database/");
+	strcat(temp_file, ".");
+	strcat(temp_file, database);
+	strcat(temp_file, "_batch");
+	fp = fopen(temp_file,"a");
+	n = batch_number(database);
+	batch ybatch;
+	for(i = 0; i < n; i++) {
+		ybatch = get_batch(database, n-1);
+		if(i!=index)
+			fprintf(fp,"%d %d %d %s\n",ybatch.index,ybatch.parent,ybatch.strength,ybatch.name);
+		else
+			fprintf(fp,"%d %d %d %s\n",xbatch->index,xbatch->parent,xbatch->strength,xbatch->name);
+	}
+	remove(file);
+	rename(temp_file,file);
 	fclose(fp);
-	free(xbatch);
 	return 0;
 }
 batch get_batch(char *database, int index) {

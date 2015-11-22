@@ -28,7 +28,7 @@ int add_room(char *database, room *xroom);
 int remove_room(char *database, int index);
 /*This function removes the room from the given database */
 
-int edit_room(char *database, int index, char *name);
+int edit_room(char *database, int index, room *xroom);
 /*This function edits the name of the room from the given database */
 room get_room(char *database, int n);
 /* Returns the nth room in the database , irrespective of the index*/
