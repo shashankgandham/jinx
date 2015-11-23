@@ -203,9 +203,6 @@ int database_number() {
 	return i;
 	fclose(fp);
 }
-void sig_handler(int signo) {
-}
-
 int main_menu() {
 	int i, c, x, y, n;
 	int choice = 0;
@@ -244,7 +241,7 @@ begin_main_menu:
 	mvwaddch(win, y - 3, 0, ACS_LTEE);
 	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
-	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");
+	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit\t\tS:Sort");
 	refresh();
 	if(n) {
 		post_menu(menu);
@@ -279,6 +276,10 @@ begin_main_menu:
 				case 'Q':
 					remove_menu(menu,items, n);
 					return n+2;
+				case 's':
+				case 'S':
+					remove_menu(menu,items, n);
+					return n+3;
 				default:
 					break;
 			}			
@@ -322,6 +323,12 @@ begin_main_menu:
 	}
 	return -1;
 }
+void sort_database() {
+	system("sort Database/database.txt -o Database/.database_temp.txt");
+	remove("Database/database.txt");
+	rename("Database/.database_temp.txt","Database/database.txt");
+}
+
 int main() {
 	int choice, n;
 	char database[128];
@@ -338,6 +345,8 @@ int main() {
 		}
 		else if(choice == n + 1)
 			new_database_form();
+		else if(choice == n + 3)
+			sort_database();
 		else {
 			get_database(choice, database);
 			database_menu(database);
