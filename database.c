@@ -192,8 +192,6 @@ int database_number() {
 	char choices[128];
 	if(fp == NULL) {
 		fp = fopen("Database/database.txt","w");
-		fprintf(fp,"New Database\n");
-		fprintf(fp,"Exit\n");
 		fclose(fp);
 		return 0;
 	}
@@ -221,51 +219,90 @@ int main_menu() {
 	ITEM **items;
 	keypad(stdscr, TRUE);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
-	items = (ITEM **)calloc(n + 2, sizeof(ITEM *));
+	items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
 	for(i = 0; i < n; i++) {
 		items[i] = new_item(choices[i], NULL);
-	}	
+	}
 	menu = new_menu((ITEM **)items);
-	win = newwin(0, 0, 0, 0);
-	getmaxyx(win,y,x);
+	getmaxyx(stdscr,y,x);
+	win = newwin(y, x, 0, 0);
 	keypad(win, TRUE);
 	set_menu_win(menu, win);
-	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	set_menu_sub(menu, derwin(win, y - 7, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
 	set_menu_mark(menu, " * ");
-	box(win, 0, 0);
+	box(win, 0,0);
 	print_in_middle(win, 1, 0, x, "My Menu", COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
-	refresh(); 
-	post_menu(menu);
-	wrefresh(win);
+	mvwaddch(win, y - 3, 0, ACS_LTEE);
+	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
+	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");	
+	refresh();
 	int choice = 0;
-	while((c = wgetch(win)))
-	{       
-		switch(c)
-		{	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(choice != (n - 1))
-					choice++;
-				break;
-			
-			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(choice != 0)
-					choice--;
-				break;	
-			case 10:
-				remove_menu(menu, items, n);
-				return choice;
-			
-			default:
-				break;
-		}
+	if(n) {
+		post_menu(menu);
 		wrefresh(win);
-	}	
-	return -1;
+		while((c = wgetch(win)))
+		{       
+			switch(c)
+			{	case KEY_DOWN:
+					menu_driver(menu, REQ_DOWN_ITEM);
+					if(choice != (n - 1))
+						choice++;
+					break;
+			
+				case KEY_UP:
+					menu_driver(menu, REQ_UP_ITEM);
+					if(choice != 0)
+						choice--;
+					break;	
+				case 10:
+					remove_menu(menu, items, n);
+					return choice;
+					break;
+				case 'n':
+				case 'N':
+					remove_menu(menu,items, n);
+					return n+1;
+				case 'q':
+				case 'Q':
+					remove_menu(menu,items, n);
+					return n+2;
+					break;
+				default:
+					break;
+			}
+			wrefresh(win);
+		}	
+	}
+	else {
+		
+		mvwprintw(win,5,3*x/7,"No database found :(\n");	
+		wrefresh(win);
+		curs_set(0);
+		while((c = wgetch(win)))
+		{       
+			switch(c) {	
+				case 'n':
+				case 'N':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return n+1;
+				case 'q':
+				case 'Q':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return n+2;
+				default:
+					break;
+			}
+			wrefresh(win);
+		}
+	}
+		return -1;
 }
 int main() {
 	int choice, n;
@@ -277,11 +314,11 @@ int main() {
 	while(1) {
 		n = database_number();
 		choice = main_menu();
-		if(choice == n - 1) {
+		if(choice == n + 2) {
 			endwin();
 			return 0;
 		}
-		else if(choice == n - 2)
+		else if(choice == n + 1)
 			new_database_form();
 		else {
 			get_database(choice, database);
