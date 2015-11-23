@@ -47,6 +47,7 @@ int start_batch(char *database);
 int batch_menu(char *database);
 /*This function shows the batch menu */
 
+int batch_submenu(char *database,int index);
 int batch_form(char *database);
 /*This handles all the forms of the batch datastructure */
 #endif

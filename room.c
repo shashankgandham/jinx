@@ -137,20 +137,85 @@ int sort_room(char *database , int(*compare)(const void *x ,const void *y)){
 
 	return 0;
 }
-
 int start_room(char *database){
-	int n, total;
+	int choice, n, sub_choice;
 	while(1) {
-		n = room_menu(database);
-		total = room_number(database) + 2;
-		if(n == total - 1)
+		choice = room_menu(database);
+		n = room_number(database) + 2;
+		if(choice == n - 1)
 			break;
-		if(total - 2 == n)
+		else if(choice == n - 2)
 			room_form(database);
+		else {
+			sub_choice = room_submenu(database, choice);
+		}
 	}
 	return 0;
 }
+int room_submenu(char *database,int index){
+	int i, c, n = 2, choice;
+	char *choices[] = {
+		"Remove Room",
+		"Edit Room",
+	};
+	WINDOW *win;
+	ITEM **items;
+	MENU *menu;
+	start_color();
+	cbreak();
+	noecho();
+	keypad(stdscr, TRUE);	
+	items = (ITEM **)calloc(n + 2, sizeof(ITEM *));
+	for(i = 0; i < n; ++i) {
+		items[i] = new_item(choices[i], NULL);
+	}
+	items[i] = new_item("Back",NULL);
+	n+=1;
+	menu = new_menu((ITEM **)items);
+	win = newwin(0, 0, 0, 0);
+	int y,x;
+	getmaxyx(win,y,x);
+	keypad(win, TRUE);
+	set_menu_win(menu, win);
+	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
+	set_menu_format(menu,x - 4, 1);
+	set_menu_mark(menu, " * ");
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, x,get_room(database, index).name, COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, 2, x - 1, ACS_RTEE);
+	refresh();
+	post_menu(menu);
+	wrefresh(win);
+	choice = 0;
+	while((c = wgetch(win)))
+	{       switch(c)
+		{	case KEY_DOWN:
+				menu_driver(menu, REQ_DOWN_ITEM);
+				if(choice != n -1)
+					choice++;
+				break;
 
+			case KEY_UP:
+				menu_driver(menu, REQ_UP_ITEM);
+				if(choice != 0)
+					choice--;
+				break;
+			
+			case 10: /* Enter */
+				remove_menu(menu,items,n);
+				break;
+			
+			default:
+				break;
+		}
+		if(c == 10)
+			break;
+		wrefresh(win);
+	}	
+	return choice;
+}
 int room_menu(char *database){
 	int i, c, n, choice;
 	room *xroom;

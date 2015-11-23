@@ -47,6 +47,7 @@ int start_room(char *database);
 int room_menu(char *database);
 /*This function shows the room menu */
 
+int room_submenu(char *database,int index);
 int room_form(char *database);
 /*This handles all the forms of the room datastructure */
 #endif

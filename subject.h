@@ -47,6 +47,7 @@ int start_subject(char *database);
 int subject_menu(char *database);
 /*This function shows the subject menu */
 
+int subject_submenu(char *database,int index);
 int subject_form(char *database);
 /*This handles all the forms of the subject datastructure */
 #endif

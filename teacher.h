@@ -48,5 +48,7 @@ int start_teacher(char *database);
 int teacher_menu(char *database);
 /*This function shows the teacher menu */
 
+int teacher_submenu(char *database,int index);
+
 int teacher_form(char *database);
 /*This handles all the forms of the teacher datastructure */
