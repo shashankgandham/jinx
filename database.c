@@ -141,19 +141,29 @@ int show_database_menu(char *database) {
 			
 			case 10: /* Enter */
 				remove_menu(menu, items, n);
-				return choice;
+				break;
 			
 			default:
-			break;
+				break;
 		}
+		if(c == 10)
+			break;
 		wrefresh(win);
 	}	
-	return -1;
+	return choice;
 }
 void database_menu(char *database) {
 	int n = 8, choice;
 	while(1){
 		choice = show_database_menu(database);
+		if(choice == 0)
+			start_teacher(database);
+		if(choice == 1)
+			start_subject(database);
+		if(choice == 2)
+			start_batch(database);
+		if(choice == 3)
+			start_room(database);
 		if(choice == n - 1)
 			return;
 		if(choice == n - 2) {

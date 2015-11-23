@@ -13,16 +13,15 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef alloc_header
-	#include "alloc.h"
-#endif
+#include "alloc.h"
+#ifndef _BATCH_H
+#define _BATCH_H
 typedef struct batch{
 	int index;
 	int parent;
 	char name[128];
 	int strength;
 }batch;
-
 int add_batch(char *database, batch *xbatch);
 /*This function adds a batch to the database */
 
@@ -36,7 +35,7 @@ batch get_batch(char *database, int n);
 int batch_number(char *database);
 /*Returns the number of batchs in the database */
 
-alloc *find_batch_info(char *database, int index);
+int *find_batch_info(char *database, int index);
 /*This function returns a list of subjects taught by the batch */ 
 
 int sort_batch(char *database , int(*compare )(const void *x ,const void *y));
@@ -50,3 +49,4 @@ int batch_menu(char *database);
 
 int batch_form(char *database);
 /*This handles all the forms of the batch datastructure */
+#endif

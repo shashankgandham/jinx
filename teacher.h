@@ -13,7 +13,8 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef alloc_header
+#define _TEACHER_H
+#ifndef _ALLOC_H
 	#include "alloc.h"
 #endif
 
@@ -23,7 +24,6 @@ typedef struct teacher{
 	int week_time;
 }teacher;
 
-int add_teacher(char *database, teacher *xteacher);
 /*This function adds a teacher to the database */
 
 int remove_teacher(char *database, int index);
@@ -36,7 +36,7 @@ teacher get_teacher(char *database, int n);
 int teacher_number(char *database);
 /*Returns the number of teachers in the database */
 
-alloc *find_teacher_info(char *database, int index);
+int *find_teacher_info(char *database, int index);
 /*This function returns a list of subjects taught by the teacher */ 
 
 int sort_teacher(char *database , int(*compare )(const void *x ,const void *y));

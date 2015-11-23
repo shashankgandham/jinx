@@ -14,7 +14,6 @@
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "teacher.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -23,14 +22,12 @@
 int add_teacher(char *database, teacher *xteacher) {
 	FILE *fp;
 	int n;
-	char file[16];
+	char file[64];
 	n = teacher_number(database);
 	if(n) {
-		teacher *yteacher;
-		yteacher = (teacher *)malloc(sizeof(teacher));
-		*yteacher = get_teacher(database, n-1);
-		xteacher -> index = yteacher->index + 1;
-		free(yteacher);
+		teacher yteacher;
+		yteacher = get_teacher(database, n-1);
+		xteacher -> index = yteacher.index + 1;
 	}
 	else
 		xteacher->index = 0;
@@ -42,10 +39,11 @@ int add_teacher(char *database, teacher *xteacher) {
 	fclose(fp);
 	return 0;
 }
+
 int remove_teacher(char *database, int index){
 	FILE *fp;
 	int n, i;
-	char file[16],temp_file[32];
+	char file[64],temp_file[64];
 	n = teacher_number(database);
 	teacher xteacher;	
 	strcpy(temp_file, "Database/");
@@ -70,7 +68,7 @@ int remove_teacher(char *database, int index){
 int edit_teacher(char *database, int index, teacher *xteacher){
 	FILE *fp;
 	int n, i;
-	char file[16], temp_file[32];
+	char file[64], temp_file[64];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_teacher");
@@ -96,7 +94,7 @@ int edit_teacher(char *database, int index, teacher *xteacher){
 teacher get_teacher(char *database, int index) {
 	FILE *fp;
 	int n = 0;
-	char file[16];
+	char file[64];
 	teacher xteacher;
 	strcpy(file, "Database/");
 	strcat(file, database);
@@ -113,26 +111,29 @@ teacher get_teacher(char *database, int index) {
 int teacher_number(char *database) {
 	FILE *fp;
 	int n = 0;
-	char file[16];
+	char file[64];
 	teacher xteacher;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_teacher");
 	fp = fopen(file,"r");
+	if(fp == NULL) {
+		fp = fopen(file,"w");
+		fclose(fp);
+		return 0;
+	}
 	while(fscanf(fp,"%d %d %[^\n]s",&xteacher.index, &xteacher.week_time, xteacher.name) != EOF)
 		n++;
 	fclose(fp);
 	return n;
 }
-alloc *find_teacher_info(char *database, int index){
-	alloc *xalloc;
-	xalloc = (alloc *)malloc(sizeof(alloc));
-	return xalloc;
+int *find_teacher_info(char *database, int index){
 }
 int sort_teacher(char *database , int(*compare)(const void *x ,const void *y)){
 
 	return 0;
 }
+
 int start_teacher(char *database){
 	int n, total;
 	while(1) {
@@ -140,12 +141,15 @@ int start_teacher(char *database){
 		total = teacher_number(database) + 2;
 		if(n == total - 1)
 			break;
+		if(total - 2 == n)
+			teacher_form(database);
 	}
 	return 0;
 }
+
 int teacher_menu(char *database){
-	char teacher_choices[128][128];
 	int i, c, n, choice;
+	teacher *xteacher;
 	WINDOW *win;
 	ITEM **items;
 	MENU *menu;
@@ -154,10 +158,15 @@ int teacher_menu(char *database){
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);	
-	items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
+	xteacher = (teacher *)malloc(sizeof(teacher) * (n + 1));
+	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
 	for(i = 0; i < n; ++i) {
-		items[i] = new_item(teacher_choices[i], NULL);
-	}	
+		xteacher[i] = get_teacher(database,i);
+		items[i] = new_item(xteacher[i].name, NULL);
+	}
+	items[i] = new_item("Add Teacher",NULL);
+	items[i + 1] = new_item("Back",NULL);
+	n+=2;
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	int y,x;
@@ -192,16 +201,19 @@ int teacher_menu(char *database){
 			
 			case 10: /* Enter */
 				remove_menu(menu,items,n);
-				return choice;
+				break;
 			
 			default:
 				break;
 		}
+		if(c == 10)
+			break;
 		wrefresh(win);
 	}	
-	return 1;
-
+	free(xteacher);
+	return choice;
 }
+
 int teacher_form(char *database){
 	refresh();
 	teacher xteacher;
@@ -213,7 +225,7 @@ int teacher_form(char *database){
 	win = newwin(6, 40, y/3, x/3);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, 40, "Enter the name of database", COLOR_PAIR(1));
+	print_in_middle(win, 1, 0, 40, "Enter the Name of Teacher", COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, 38);
 	mvwaddch(win, 2, 39, ACS_RTEE);
@@ -228,7 +240,7 @@ int teacher_form(char *database){
 	mvwaddch(win, 2, 39, ACS_RTEE);
 	wrefresh(win);
 	move(y/3 + 3,x/3 + 2);
-	scanw("%d",xteacher.week_time);
+	scanw("%d",&xteacher.week_time);
 	add_teacher(database, &xteacher);
 	refresh();
 	endwin();

@@ -1,11 +1,11 @@
-/*  This file is part of Jinx originally written by Shashank Gandham.
+/*  This file is part of Jinx originally written by Shashank gandham.
 
-    Jinx is free software: you can redistribute it and/or modify
+    Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    Jinx is distributed in the hope that it will be useful,
+    Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -22,15 +22,15 @@
 int add_room(char *database, room *xroom) {
 	FILE *fp;
 	int n;
-	char file[16];
+	char file[64];
 	n = room_number(database);
 	if(n) {
-		room *yroom;
-		yroom = (room *)malloc(sizeof(room));
-		*yroom = get_room(database, n-1);
-		xroom -> index = yroom->index + 1;
-		free(yroom);
+		room yroom;
+		yroom = get_room(database, n-1);
+		xroom -> index = yroom.index + 1;
 	}
+	else
+		xroom->index = 0;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_room");
@@ -39,10 +39,11 @@ int add_room(char *database, room *xroom) {
 	fclose(fp);
 	return 0;
 }
+
 int remove_room(char *database, int index){
 	FILE *fp;
 	int n, i;
-	char file[16],temp_file[32];
+	char file[64],temp_file[64];
 	n = room_number(database);
 	room xroom;	
 	strcpy(temp_file, "Database/");
@@ -64,10 +65,11 @@ int remove_room(char *database, int index){
 	fclose(fp);
 	return 0;
 }
+
 int edit_room(char *database, int index, room *xroom){
 	FILE *fp;
 	int n, i;
-	char file[16], temp_file[32];
+	char file[64], temp_file[64];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_room");
@@ -90,16 +92,17 @@ int edit_room(char *database, int index, room *xroom){
 	fclose(fp);
 	return 0;
 }
+
 room get_room(char *database, int index) {
 	FILE *fp;
 	int n = 0;
-	char file[16];
+	char file[64];
 	room xroom;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_room");
 	fp = fopen(file,"r");
-	while(fscanf(fp,"%d %d %[^\n]s",&xroom.index,&xroom.capacity, xroom.name) != EOF) {
+	while(fscanf(fp,"%d %d %[^\n]s",&xroom.index, &xroom.capacity, xroom.name) != EOF) {
 		if(n == index)
 			break;
 		n++;
@@ -110,23 +113,31 @@ room get_room(char *database, int index) {
 int room_number(char *database) {
 	FILE *fp;
 	int n = 0;
-	char file[16];
+	char file[64];
 	room xroom;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_room");
 	fp = fopen(file,"r");
-	while(fscanf(fp,"%d %d %[^\n]s",&xroom.index,&xroom.capacity, xroom.name) != EOF)
+	if(fp == NULL) {
+		fp = fopen(file,"w");
+		fclose(fp);
+		return 0;
+	}
+	while(fscanf(fp,"%d %d %[^\n]s",&xroom.index, &xroom.capacity, xroom.name) != EOF)
 		n++;
 	fclose(fp);
 	return n;
 }
-alloc *find_room_info(char *database, int index){
 
+int *find_room_info(char *database, int index){
 }
+
 int sort_room(char *database , int(*compare)(const void *x ,const void *y)){
 
+	return 0;
 }
+
 int start_room(char *database){
 	int n, total;
 	while(1) {
@@ -134,12 +145,15 @@ int start_room(char *database){
 		total = room_number(database) + 2;
 		if(n == total - 1)
 			break;
+		if(total - 2 == n)
+			room_form(database);
 	}
 	return 0;
 }
+
 int room_menu(char *database){
-	char room_choices[128][128];
 	int i, c, n, choice;
+	room *xroom;
 	WINDOW *win;
 	ITEM **items;
 	MENU *menu;
@@ -148,10 +162,15 @@ int room_menu(char *database){
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);	
-	items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
+	xroom = (room *)malloc(sizeof(room) * (n + 1));
+	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
 	for(i = 0; i < n; ++i) {
-		items[i] = new_item(room_choices[i], NULL);
-	}	
+		xroom[i] = get_room(database,i);
+		items[i] = new_item(xroom[i].name, NULL);
+	}
+	items[i] = new_item("Add Room",NULL);
+	items[i + 1] = new_item("Back",NULL);
+	n+=2;
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	int y,x;
@@ -162,7 +181,7 @@ int room_menu(char *database){
 	set_menu_format(menu,x - 4, 1);
 	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
+	print_in_middle(win, 1, 0, x, "Rooms" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
@@ -186,16 +205,48 @@ int room_menu(char *database){
 			
 			case 10: /* Enter */
 				remove_menu(menu,items,n);
-				return choice;
+				break;
 			
 			default:
 				break;
 		}
+		if(c == 10)
+			break;
 		wrefresh(win);
 	}	
-	return -1;
-
+	free(xroom);
+	return choice;
 }
 int room_form(char *database){
-
+	refresh();
+	room xroom;
+	echo();
+	WINDOW *win;
+	int y,x;	
+	start_color();
+	getmaxyx(stdscr,y,x);
+	win = newwin(6, 40, y/3, x/3);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Enter the Name of Room", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw(" %[^\n]s",xroom.name);
+	clear();
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Enter the capacity of the room", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw("%d",&xroom.capacity);
+	add_room(database, &xroom);
+	refresh();
+	endwin();
+	clear();
+	return 0;
 }

@@ -13,15 +13,16 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _ALLOC_H
+#define _ALLOC_H
 #include <menu.h>
-#define alloc_header
-
 typedef struct alloc{
+	int index;
 	int teacher;
 	int subject;
 	int batch;
 	int slot;
 }alloc;
-
 void remove_menu(MENU *menu, ITEM **items, int n);
 void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color);
+#endif

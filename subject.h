@@ -13,16 +13,15 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef alloc_header
-	#include "alloc.h"
-#endif
+#include "alloc.h"
+#ifndef _SUBJECT_H
+#define _SUBJECT_H
 typedef struct subject{
 	int index;
 	char name[128];
 	int slot_len;
 	int slot_per_week;
 }subject;
-
 int add_subject(char *database, subject *xsubject);
 /*This function adds a subject to the database */
 
@@ -36,7 +35,7 @@ subject get_subject(char *database, int n);
 int subject_number(char *database);
 /*Returns the number of subjects in the database */
 
-alloc *find_subject_info(char *database, int index);
+int *find_subject_info(char *database, int index);
 /*This function returns a list of subjects taught by the subject */ 
 
 int sort_subject(char *database , int(*compare )(const void *x ,const void *y));
@@ -50,3 +49,4 @@ int subject_menu(char *database);
 
 int subject_form(char *database);
 /*This handles all the forms of the subject datastructure */
+#endif

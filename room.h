@@ -13,9 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#ifndef alloc_header
-	#include "alloc.h"
-#endif
+#include "alloc.h"
+#ifndef _ROOM_H
+#define _ROOM_H
 typedef struct room{
 	int index;
 	char name[128];
@@ -35,7 +35,7 @@ room get_room(char *database, int n);
 int room_number(char *database);
 /*Returns the number of rooms in the database */
 
-alloc *find_room_info(char *database, int index);
+int *find_room_info(char *database, int index);
 /*This function returns a list of subjects taught by the room */ 
 
 int sort_room(char *database , int(*compare )(const void *x ,const void *y));
@@ -49,3 +49,4 @@ int room_menu(char *database);
 
 int room_form(char *database);
 /*This handles all the forms of the room datastructure */
+#endif

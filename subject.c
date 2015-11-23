@@ -1,11 +1,11 @@
-/*  This file is part of Jinx originally written by Shashank Gandham.
+/*  This file is part of Jinx originally written by Shashank gandham.
 
-    Jinx is free software: you can redistribute it and/or modify
+    Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
 
-    Jinx is distributed in the hope that it will be useful,
+    Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
@@ -22,15 +22,15 @@
 int add_subject(char *database, subject *xsubject) {
 	FILE *fp;
 	int n;
-	char file[16];
+	char file[64];
 	n = subject_number(database);
 	if(n) {
-		subject *ysubject;
-		ysubject = (subject *)malloc(sizeof(subject));
-		*ysubject = get_subject(database, n-1);
-		xsubject -> index = ysubject->index + 1;
-		free(ysubject);
+		subject ysubject;
+		ysubject = get_subject(database, n-1);
+		xsubject -> index = ysubject.index + 1;
 	}
+	else
+		xsubject->index = 0;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_subject");
@@ -42,7 +42,7 @@ int add_subject(char *database, subject *xsubject) {
 int remove_subject(char *database, int index){
 	FILE *fp;
 	int n, i;
-	char file[16],temp_file[32];
+	char file[64],temp_file[64];
 	n = subject_number(database);
 	subject xsubject;	
 	strcpy(temp_file, "Database/");
@@ -56,7 +56,7 @@ int remove_subject(char *database, int index){
 	for(i = 0; i < n; i++) {
 		if(i != index) {
 			xsubject = get_subject(database, i);
-			fprintf(fp,"%d %d %s\n",xsubject.index,xsubject.week_time, xsubject.name);
+			fprintf(fp,"%d %d %d %s\n",xsubject.index,xsubject.slot_len,xsubject.slot_per_week ,xsubject.name);
 		}
 	}
 	remove(file);
@@ -67,7 +67,7 @@ int remove_subject(char *database, int index){
 int edit_subject(char *database, int index, subject *xsubject){
 	FILE *fp;
 	int n, i;
-	char file[16], temp_file[32];
+	char file[64], temp_file[64];
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_subject");
@@ -81,7 +81,7 @@ int edit_subject(char *database, int index, subject *xsubject){
 	for(i = 0; i < n; i++) {
 		ysubject = get_subject(database, n-1);
 		if(i!=index)
-			fprintf(fp,"%d %d %d %s\n",ysubject.index,ysubject.slot_len,ysubject.slot_per_week,ysubject.name);
+			fprintf(fp,"%d %d %d %s\n",ysubject.index,ysubject.slot_len,ysubject.slot_per_week, ysubject.name);
 		else
 			fprintf(fp,"%d %d %d %s\n",xsubject->index,xsubject->slot_len,xsubject->slot_per_week, xsubject->name);
 	}
@@ -93,13 +93,13 @@ int edit_subject(char *database, int index, subject *xsubject){
 subject get_subject(char *database, int index) {
 	FILE *fp;
 	int n = 0;
-	char file[16];
+	char file[64];
 	subject xsubject;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_subject");
 	fp = fopen(file,"r");
-	while(fscanf(fp,"%d %d %d %[^\n]s",&xsubject.index,&xsubject.slot_len,&xsubject.slot_per_week, xsubject.name) != EOF) {
+	while(fscanf(fp,"%d %d %d %[^\n]s",&xsubject.index, &xsubject.slot_len,&xsubject.slot_per_week,xsubject.name) != EOF) {
 		if(n == index)
 			break;
 		n++;
@@ -110,22 +110,27 @@ subject get_subject(char *database, int index) {
 int subject_number(char *database) {
 	FILE *fp;
 	int n = 0;
-	char file[16];
+	char file[64];
 	subject xsubject;
 	strcpy(file, "Database/");
 	strcat(file, database);
 	strcat(file, "_subject");
 	fp = fopen(file,"r");
-	while(fscanf(fp,"%d %d %d %[^\n]s",&xsubject.index,&xsubject.slot_len,&xsubject.slot_per_week, xsubject.name) != EOF)
+	if(fp == NULL) {
+		fp = fopen(file,"w");
+		fclose(fp);
+		return 0;
+	}
+	while(fscanf(fp,"%d %d %d %[^\n]s",&xsubject.index, &xsubject.slot_len, &xsubject.slot_per_week, xsubject.name) != EOF)
 		n++;
 	fclose(fp);
 	return n;
 }
-alloc *find_subject_info(char *database, int index){
-
+int *find_subject_info(char *database, int index){
 }
 int sort_subject(char *database , int(*compare)(const void *x ,const void *y)){
 
+	return 0;
 }
 int start_subject(char *database){
 	int n, total;
@@ -134,12 +139,14 @@ int start_subject(char *database){
 		total = subject_number(database) + 2;
 		if(n == total - 1)
 			break;
+		if(total - 2 == n)
+			subject_form(database);
 	}
 	return 0;
 }
 int subject_menu(char *database){
-	char subject_choices[128][128];
 	int i, c, n, choice;
+	subject *xsubject;
 	WINDOW *win;
 	ITEM **items;
 	MENU *menu;
@@ -148,10 +155,15 @@ int subject_menu(char *database){
 	cbreak();
 	noecho();
 	keypad(stdscr, TRUE);	
-	items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
+	xsubject = (subject *)malloc(sizeof(subject) * (n + 1));
+	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
 	for(i = 0; i < n; ++i) {
-		items[i] = new_item(subject_choices[i], NULL);
-	}	
+		xsubject[i] = get_subject(database,i);
+		items[i] = new_item(xsubject[i].name, NULL);
+	}
+	items[i] = new_item("Add Subject",NULL);
+	items[i + 1] = new_item("Back",NULL);
+	n+=2;
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	int y,x;
@@ -162,7 +174,7 @@ int subject_menu(char *database){
 	set_menu_format(menu,x - 4, 1);
 	set_menu_mark(menu, " * ");
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
+	print_in_middle(win, 1, 0, x, "Subjects" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
@@ -186,16 +198,57 @@ int subject_menu(char *database){
 			
 			case 10: /* Enter */
 				remove_menu(menu,items,n);
-				return choice;
+				break;
 			
 			default:
 				break;
 		}
+		if(c == 10)
+			break;
 		wrefresh(win);
 	}	
-	return -1;
-
+	free(xsubject);
+	return choice;
 }
 int subject_form(char *database){
-
+	refresh();
+	subject xsubject;
+	echo();
+	WINDOW *win;
+	int y,x;	
+	start_color();
+	getmaxyx(stdscr,y,x);
+	win = newwin(6, 40, y/3, x/3);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Enter the Name of Subject", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw(" %[^\n]s",xsubject.name);
+	clear();
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Length of a single slot for the Subject", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw("%d",&xsubject.slot_len);
+	clear();
+	box(win, 0, 0);
+	print_in_middle(win, 1, 0, 40, "Enter the number of such slots in a week", COLOR_PAIR(1));
+	mvwaddch(win, 2, 0, ACS_LTEE);
+	mvwhline(win, 2, 1, ACS_HLINE, 38);
+	mvwaddch(win, 2, 39, ACS_RTEE);
+	wrefresh(win);
+	move(y/3 + 3,x/3 + 2);
+	scanw("%d",&xsubject.slot_per_week);
+	add_subject(database, &xsubject);
+	refresh();
+	endwin();
+	clear();
+	return 0;
 }
