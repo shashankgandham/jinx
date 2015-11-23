@@ -208,6 +208,7 @@ void sig_handler(int signo) {
 
 int main_menu() {
 	int i, c, x, y, n;
+	int choice = 0;
 	n = database_number();
 	char **choices;
 	choices = (char **)malloc(sizeof(char *) * (n + 3));
@@ -220,6 +221,7 @@ int main_menu() {
 	n = i;
 	WINDOW *win;
 	ITEM **items;
+begin_main_menu:
 	keypad(stdscr, TRUE);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
@@ -244,41 +246,15 @@ int main_menu() {
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");
 	refresh();
-	int choice = 0;
 	if(n) {
 		post_menu(menu);
-		wrefresh(win);
+		wrefresh(win);	
+		for(i = 0; i < choice; i++)
+			menu_driver(menu, REQ_DOWN_ITEM);
+
 		while((c = wgetch(win)))
-		{
-			if(signal(SIGWINCH, NULL) != SIG_ERR) {
-				remove_menu(menu,items, n);
-				keypad(stdscr, TRUE);
-				init_pair(1, COLOR_RED, COLOR_BLACK);
-				items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
-				for(i = 0; i < n; i++) {
-					items[i] = new_item(choices[i], NULL);
-				}
-				menu = new_menu((ITEM **)items);
-				getmaxyx(stdscr,y,x);
-				win = newwin(y, x, 0, 0);
-				set_menu_win(menu, win);
-				set_menu_sub(menu, derwin(win, y - 7, 38, 5, 0.4*x));
-				set_menu_format(menu,x - 4, 1);
-				set_menu_mark(menu, " * ");
-				box(win, 0,0);
-				print_in_middle(win, 1, 0, x, "My Menu", COLOR_PAIR(1));
-				mvwaddch(win, 2, 0, ACS_LTEE);
-				mvwhline(win, 2, 1, ACS_HLINE, x - 2);
-				mvwaddch(win, 2, x - 1, ACS_RTEE);
-				mvwaddch(win, y - 3, 0, ACS_LTEE);
-				mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
-				mvwaddch(win, y - 3, x - 1, ACS_RTEE);
-				mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");
-				getmaxyx(stdscr,y,x);
-				refresh();
-				post_menu(menu);
-				wrefresh(win);
-			}
+		{	
+		
 			switch(c)
 			{	case KEY_DOWN:
 					menu_driver(menu, REQ_DOWN_ITEM);
@@ -305,8 +281,14 @@ int main_menu() {
 					return n+2;
 				default:
 					break;
-			}
+			}			
 			wrefresh(win);
+			if(signal(SIGWINCH, NULL) != SIG_ERR) {
+				remove_menu(menu,items, n);
+				wrefresh(win);
+				goto begin_main_menu;
+			}
+
 		}
 	}
 	else {
@@ -329,6 +311,11 @@ int main_menu() {
 					return n+2;
 				default:
 					break;
+			}
+			
+			if(signal(SIGWINCH, NULL) != SIG_ERR) {
+				wrefresh(win);
+				goto begin_main_menu;
 			}
 			wrefresh(win);
 		}
