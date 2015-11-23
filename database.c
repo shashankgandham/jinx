@@ -12,7 +12,7 @@
 
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
-*/
+    */
 
 #include "teacher.h"
 #include "subject.h"
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
+#include <signal.h>
 int new_database(char *name) {
 	FILE *fp, *gp;
 	char database[128];
@@ -38,12 +38,12 @@ int new_database(char *name) {
 	fclose(fp);
 	fclose(gp);
 	remove("Database/database.txt");
-	rename("Database/.database_temp.txt","Database/database.txt");	
+	rename("Database/.database_temp.txt","Database/database.txt");
 	return 1;
 }
 int remove_database(char *data) {
 	FILE *fp, *gp;
-	char database[128];	
+	char database[128];
 	int d, i = 0;
 	fp = fopen("Database/database.txt","r");
 	gp = fopen("Database/.database_temp.txt","w");
@@ -55,7 +55,7 @@ int remove_database(char *data) {
 	fclose(fp);
 	fclose(gp);
 	remove("Database/database.txt");
-	rename("Database/.database_temp.txt","Database/database.txt");	
+	rename("Database/.database_temp.txt","Database/database.txt");
 	return 1;
 }
 
@@ -64,7 +64,7 @@ void new_database_form() {
 	char name[128];
 	echo();
 	WINDOW *win;
-	int y,x;	
+	int y,x;
 	start_color();
 	getmaxyx(stdscr,y,x);
 	win = newwin(6, 40, y/3, x/3);
@@ -83,7 +83,7 @@ void new_database_form() {
 	clear();
 	return;
 }
-int show_database_menu(char *database) {		
+int show_database_menu(char *database) {
 	int i, c;
 	int n = 8;
 	ITEM **items;
@@ -99,7 +99,7 @@ int show_database_menu(char *database) {
 		"Remove Database",
 		"Back",
 	};
-	int x, y;	
+	int x, y;
 	start_color();
 	cbreak();
 	noecho();
@@ -107,7 +107,7 @@ int show_database_menu(char *database) {
 	items = (ITEM **)calloc(n + 2, sizeof(ITEM *));
 	for(i = 0; i < n; ++i) {
 		items[i] = new_item(choices[i], NULL);
-	}	
+	}
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	getmaxyx(win,y,x);
@@ -128,28 +128,28 @@ int show_database_menu(char *database) {
 	while((c = wgetch(win)))
 	{       switch(c)
 		{	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(choice != n - 1)
-					choice++;
-				break;
-			
+			menu_driver(menu, REQ_DOWN_ITEM);
+			if(choice != n - 1)
+				choice++;
+			break;
+
 			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(choice != 0)
-					choice--;
-				break;
-			
+			menu_driver(menu, REQ_UP_ITEM);
+			if(choice != 0)
+				choice--;
+			break;
+
 			case 10: /* Enter */
-				remove_menu(menu, items, n);
-				break;
-			
+			remove_menu(menu, items, n);
+			break;
+
 			default:
-				break;
+			break;
 		}
 		if(c == 10)
 			break;
 		wrefresh(win);
-	}	
+	}
 	return choice;
 }
 void database_menu(char *database) {
@@ -203,7 +203,10 @@ int database_number() {
 	return i;
 	fclose(fp);
 }
-int main_menu() {	
+void sig_handler(int signo) {
+}
+
+int main_menu() {
 	int i, c, x, y, n;
 	n = database_number();
 	char **choices;
@@ -239,30 +242,59 @@ int main_menu() {
 	mvwaddch(win, y - 3, 0, ACS_LTEE);
 	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
-	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");	
+	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");
 	refresh();
 	int choice = 0;
 	if(n) {
 		post_menu(menu);
 		wrefresh(win);
 		while((c = wgetch(win)))
-		{       
+		{
+			if(signal(SIGWINCH, NULL) != SIG_ERR) {
+				remove_menu(menu,items, n);
+				keypad(stdscr, TRUE);
+				init_pair(1, COLOR_RED, COLOR_BLACK);
+				items = (ITEM **)calloc(n + 1, sizeof(ITEM *));
+				for(i = 0; i < n; i++) {
+					items[i] = new_item(choices[i], NULL);
+				}
+				menu = new_menu((ITEM **)items);
+				getmaxyx(stdscr,y,x);
+				win = newwin(y, x, 0, 0);
+				set_menu_win(menu, win);
+				set_menu_sub(menu, derwin(win, y - 7, 38, 5, 0.4*x));
+				set_menu_format(menu,x - 4, 1);
+				set_menu_mark(menu, " * ");
+				box(win, 0,0);
+				print_in_middle(win, 1, 0, x, "My Menu", COLOR_PAIR(1));
+				mvwaddch(win, 2, 0, ACS_LTEE);
+				mvwhline(win, 2, 1, ACS_HLINE, x - 2);
+				mvwaddch(win, 2, x - 1, ACS_RTEE);
+				mvwaddch(win, y - 3, 0, ACS_LTEE);
+				mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+				mvwaddch(win, y - 3, x - 1, ACS_RTEE);
+				mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");
+				getmaxyx(stdscr,y,x);
+				refresh();
+				post_menu(menu);
+				wrefresh(win);
+			}
 			switch(c)
 			{	case KEY_DOWN:
 					menu_driver(menu, REQ_DOWN_ITEM);
 					if(choice != (n - 1))
 						choice++;
 					break;
-			
+
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
-					break;	
+					break;
 				case 10:
 					remove_menu(menu, items, n);
 					return choice;
-					break;
+				break;
 				case 'n':
 				case 'N':
 					remove_menu(menu,items, n);
@@ -271,21 +303,20 @@ int main_menu() {
 				case 'Q':
 					remove_menu(menu,items, n);
 					return n+2;
-					break;
 				default:
 					break;
 			}
 			wrefresh(win);
-		}	
+		}
 	}
 	else {
-		
-		mvwprintw(win,5,3*x/7,"No database found :(\n");	
+
+		mvwprintw(win,5,3*x/7,"No database found :(\n");
 		wrefresh(win);
 		curs_set(0);
 		while((c = wgetch(win)))
-		{       
-			switch(c) {	
+		{
+			switch(c) {
 				case 'n':
 				case 'N':
 					remove_menu(menu,items,n);
@@ -302,7 +333,7 @@ int main_menu() {
 			wrefresh(win);
 		}
 	}
-		return -1;
+	return -1;
 }
 int main() {
 	int choice, n;
