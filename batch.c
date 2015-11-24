@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
+#include <limits.h>
 int add_batch(char *database, batch *xbatch) {
 	FILE *fp;
 	int n;
@@ -45,7 +45,7 @@ int remove_batch(char *database, int index){
 	int n, i;
 	char file[64],temp_file[64];
 	n = batch_number(database);
-	batch xbatch;	
+	batch xbatch;
 	strcpy(temp_file, "Database/");
 	strcat(temp_file, ".");
 	strcat(temp_file, database);
@@ -137,88 +137,29 @@ int sort_batch(char *database , int(*compare)(const void *x ,const void *y)){
 
 	return 0;
 }
-
 int start_batch(char *database){
-	int choice, n, sub_choice;
+	int choice, n;
 	while(1) {
 		choice = batch_menu(database);
-		n = batch_number(database) + 2;
-		if(choice == n - 1)
+		n = batch_number(database);
+
+		if(choice == n + 1)
 			break;
-		else if(choice == n - 2)
+
+		else if(choice == n + 2)
 			batch_form(database);
-		else {
-			sub_choice = batch_submenu(database, choice);
-		}
+
+		else if(choice == INT_MIN)
+			return INT_MIN;
+
+		else if(choice == -1)
+			continue;
 	}
 	return 0;
 }
-int batch_submenu(char *database,int index){
-	int i, c, n = 2, choice;
-	char *choices[] = {
-		"Remove Batch",
-		"Edit Batch",
-	};
-	WINDOW *win;
-	ITEM **items;
-	MENU *menu;
-	start_color();
-	cbreak();
-	noecho();
-	keypad(stdscr, TRUE);	
-	items = (ITEM **)calloc(n + 2, sizeof(ITEM *));
-	for(i = 0; i < n; ++i) {
-		items[i] = new_item(choices[i], NULL);
-	}
-	items[i] = new_item("Back",NULL);
-	n+=1;
-	menu = new_menu((ITEM **)items);
-	win = newwin(0, 0, 0, 0);
-	int y,x;
-	getmaxyx(win,y,x);
-	keypad(win, TRUE);
-	set_menu_win(menu, win);
-	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
-	set_menu_format(menu,x - 4, 1);
-	set_menu_mark(menu, " * ");
-	box(win, 0, 0);
-	print_in_middle(win, 1, 0, x,get_batch(database, index).name, COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
-	mvwaddch(win, 2, x - 1, ACS_RTEE);
-	refresh();
-	post_menu(menu);
-	wrefresh(win);
-	choice = 0;
-	while((c = wgetch(win)))
-	{       switch(c)
-		{	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(choice != n -1)
-					choice++;
-				break;
 
-			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(choice != 0)
-					choice--;
-				break;
-			
-			case 10: /* Enter */
-				remove_menu(menu,items,n);
-				break;
-			
-			default:
-				break;
-		}
-		if(c == 10)
-			break;
-		wrefresh(win);
-	}	
-	return choice;
-}
 int batch_menu(char *database){
-	int i, c, n, choice;
+	int i, c, n, choice = 0;
 	batch *xbatch;
 	WINDOW *win;
 	ITEM **items;
@@ -227,16 +168,13 @@ int batch_menu(char *database){
 	start_color();
 	cbreak();
 	noecho();
-	keypad(stdscr, TRUE);	
+	keypad(stdscr, TRUE);
 	xbatch = (batch *)malloc(sizeof(batch) * (n + 1));
 	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
 	for(i = 0; i < n; ++i) {
 		xbatch[i] = get_batch(database,i);
 		items[i] = new_item(xbatch[i].name, NULL);
 	}
-	items[i] = new_item("Add Batch",NULL);
-	items[i + 1] = new_item("Back",NULL);
-	n+=2;
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	int y,x;
@@ -246,49 +184,105 @@ int batch_menu(char *database){
 	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
 	set_menu_mark(menu, " * ");
+	set_menu_spacing(menu, 0, 2, 0);
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, "Batchs" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
+	mvwaddch(win, y - 3, 0, ACS_LTEE);
+	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
-	post_menu(menu);
-	wrefresh(win);
-	choice = 0;
-	while((c = wgetch(win)))
-	{       switch(c)
-		{	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(choice != n -1)
-					choice++;
-				break;
+	if(n) {
 
-			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(choice != 0)
-					choice--;
-				break;
-			
-			case 10: /* Enter */
-				remove_menu(menu,items,n);
-				break;
-			
-			default:
-				break;
-		}
-		if(c == 10)
-			break;
+		if(n > 1)
+			mvwprintw(win,y - 2, 2,"N:New Batch\t\tR:Remove Batch\tS:Sort\t\tB:Back\tQ:Quit");
+		else
+			mvwprintw(win,y - 2, 2,"N:New Batch\t\tR:Remove Batch\tB:Back\tQ:Quit");
+		for(i = 0; i < choice; i++)
+			menu_driver(menu, REQ_DOWN_ITEM);
+		post_menu(menu);
 		wrefresh(win);
-	}	
+		while((c = wgetch(win))){
+			switch(c) {
+				case KEY_DOWN:
+					menu_driver(menu, REQ_DOWN_ITEM);
+					if(choice != n -1)
+						choice++;
+					break;
+
+				case KEY_UP:
+					menu_driver(menu, REQ_UP_ITEM);
+					if(choice != 0)
+						choice--;
+					break;
+
+				case 10: /* Enter */
+					remove_menu(menu,items,n);
+					return choice;
+				case 'R':
+				case 'r':
+					remove_batch(database, choice);
+					remove_menu(menu,items,n);
+					return -1;
+				case 'B':
+				case 'b':
+					remove_menu(menu,items,n);
+					return n + 1;
+				case 'N':
+				case 'n':
+					remove_menu(menu,items,n);
+					return n + 2;
+				case 'Q':
+				case 'q':
+					remove_menu(menu,items,n);
+					return INT_MIN;
+				default:
+					break;
+			}
+			wrefresh(win);
+		}
+	}
+	else {
+		mvwprintw(win,y - 2, 2,"N:New Batch\t\tB:Back\t\tQ:Quit");
+		mvwprintw(win,5,3*x/7,"No Batchs found :(\n");
+		wrefresh(win);
+		curs_set(0);
+		while((c = wgetch(win)))
+		{
+			switch(c) {
+				case 'n':
+				case 'N':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return n+2;
+				case 'b':
+				case 'B':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return n+1;
+				case 'Q':
+				case 'q':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return INT_MIN;
+				default:
+					break;
+			}
+
+			wrefresh(win);
+		}
+	}
 	free(xbatch);
-	return choice;
+	return -1;
 }
 int batch_form(char *database){
 	refresh();
 	batch xbatch;
 	echo();
 	WINDOW *win;
-	int y,x;	
+	int y,x;
 	start_color();
 	getmaxyx(stdscr,y,x);
 	win = newwin(6, 40, y/3, x/3);

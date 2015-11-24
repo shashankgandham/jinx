@@ -25,6 +25,8 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <limits.h>
+
 int new_database(char *name) {
 	FILE *fp, *gp;
 	char database[128];
@@ -85,19 +87,17 @@ void new_database_form() {
 }
 int show_database_menu(char *database) {
 	int i, c;
-	int n = 8;
+	int n = 6;
 	ITEM **items;
 	MENU *menu;
 	WINDOW *win;
 	char *choices[] =  {
 		"Teachers",
 		"Subjects",
-		"Classes",
+		"Batches",
 		"Rooms",
 		"Slots",
 		"Make Timetable",
-		"Remove Database",
-		"Back",
 	};
 	int x, y;
 	start_color();
@@ -114,13 +114,19 @@ int show_database_menu(char *database) {
 	keypad(win, TRUE);
 	set_menu_win(menu, win);
 	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
-	set_menu_format(menu,x - 4, 1);
+	set_menu_format(menu,y/2, 1);
 	set_menu_mark(menu, " * ");
+	set_menu_spacing(menu, 0 , 2, 0);
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, database, COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
+	
+	mvwaddch(win, y - 3, 0, ACS_LTEE);
+	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
+	mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
 	refresh();
 	post_menu(menu);
 	wrefresh(win);
@@ -140,8 +146,18 @@ int show_database_menu(char *database) {
 			break;
 
 			case 10: /* Enter */
-			remove_menu(menu, items, n);
-			break;
+				remove_menu(menu, items, n);
+				return choice;
+				break;	
+			
+			case 'B':
+			case 'b':
+				remove_menu(menu, items, n);
+				return n+1;			
+			case 'q':
+			case 'Q':
+				remove_menu(menu, items, n);
+				return INT_MIN;
 
 			default:
 			break;
@@ -150,26 +166,24 @@ int show_database_menu(char *database) {
 			break;
 		wrefresh(win);
 	}
-	return choice;
+	return -1;
 }
-void database_menu(char *database) {
-	int n = 8, choice;
+int database_menu(char *database) {
+	int n = 6, choice, exit;
 	while(1){
 		choice = show_database_menu(database);
 		if(choice == 0)
-			start_teacher(database);
+			exit = start_teacher(database);
 		if(choice == 1)
-			start_subject(database);
+			exit = start_subject(database);
 		if(choice == 2)
-			start_batch(database);
+			exit = start_batch(database);
 		if(choice == 3)
-			start_room(database);
-		if(choice == n - 1)
-			return;
-		if(choice == n - 2) {
-			remove_database(database);
-			return;
-		}
+			exit = start_room(database);
+		if(choice == n + 1)
+			return 0;
+		if(exit == INT_MIN || choice == INT_MIN)
+			return INT_MIN;
 	}
 }
 void get_database(int choice, char *choices) {
@@ -203,6 +217,7 @@ int database_number() {
 	return i;
 	fclose(fp);
 }
+
 int main_menu() {
 	int i, c, x, y, n;
 	int choice = 0;
@@ -231,8 +246,9 @@ begin_main_menu:
 	keypad(win, TRUE);
 	set_menu_win(menu, win);
 	set_menu_sub(menu, derwin(win, y - 7, 38, 5, 0.4*x));
-	set_menu_format(menu,x - 4, 1);
+	set_menu_format(menu,y - 4, 1);
 	set_menu_mark(menu, " * ");
+	set_menu_spacing(menu, 0 , 2, 0);
 	box(win, 0,0);
 	print_in_middle(win, 1, 0, x, "My Menu", COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -241,9 +257,12 @@ begin_main_menu:
 	mvwaddch(win, y - 3, 0, ACS_LTEE);
 	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
-	mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit\t\tS:Sort");
 	refresh();
 	if(n) {
+		if(n > 1)
+			mvwprintw(win,y - 2, 2,"N:New Database\tR:Remove Database\tS:Sort\t\tQ:Quit");
+		else
+			mvwprintw(win,y - 2, 2,"N:New Database\tR:Remove Database\tQ:Quit");
 		post_menu(menu);
 		wrefresh(win);	
 		for(i = 0; i < choice; i++)
@@ -251,7 +270,6 @@ begin_main_menu:
 
 		while((c = wgetch(win)))
 		{	
-		
 			switch(c)
 			{	case KEY_DOWN:
 					menu_driver(menu, REQ_DOWN_ITEM);
@@ -280,6 +298,11 @@ begin_main_menu:
 				case 'S':
 					remove_menu(menu,items, n);
 					return n+3;
+				case 'r':
+				case 'R':
+					remove_menu(menu,items,n);
+					remove_database(choices[choice]);
+					return -1;
 				default:
 					break;
 			}			
@@ -294,6 +317,7 @@ begin_main_menu:
 	}
 	else {
 
+		mvwprintw(win,y - 2, 2,"N:New Database\tQ:Quit");
 		mvwprintw(win,5,3*x/7,"No database found :(\n");
 		wrefresh(win);
 		curs_set(0);
@@ -330,6 +354,7 @@ void sort_database() {
 }
 
 int main() {
+	signal(SIGINT, SIG_IGN);
 	int choice, n;
 	char database[128];
 	initscr();
@@ -338,7 +363,11 @@ int main() {
 	noecho();
 	while(1) {
 		n = database_number();
-		choice = main_menu();
+		choice = main_menu();	
+		
+		if(choice == -1)
+			continue;
+
 		if(choice == n + 2) {
 			endwin();
 			return 0;
@@ -347,9 +376,13 @@ int main() {
 			new_database_form();
 		else if(choice == n + 3)
 			sort_database();
+		
 		else {
 			get_database(choice, database);
-			database_menu(database);
+			if(database_menu(database) == INT_MIN) {
+				endwin();
+				return 0;
+			}
 		}
 	}
 	return 0;

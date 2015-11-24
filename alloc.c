@@ -49,3 +49,4 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
 	wattroff(win, color);
 	refresh();
 }
+

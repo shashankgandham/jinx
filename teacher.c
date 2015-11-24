@@ -1,3 +1,4 @@
+
 /*  This file is part of Jinx originally written by Shashank gandham.
 
     Timetable Generator is free software: you can redistribute it and/or modify
@@ -18,6 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
+#include <limits.h>
+
 int add_teacher(char *database, teacher *xteacher) {
 	FILE *fp;
 	int n;
@@ -126,92 +130,35 @@ int teacher_number(char *database) {
 	return n;
 }
 int *find_teacher_info(char *database, int index){
+	return 0;
 }
 int sort_teacher(char *database , int(*compare)(const void *x ,const void *y)){
 
 	return 0;
 }
 int start_teacher(char *database){
-	int choice, n, sub_choice;
+	int choice, n;
 	while(1) {
 		choice = teacher_menu(database);
-		n = teacher_number(database) + 2;
-		if(choice == n - 1)
+		n = teacher_number(database);
+
+		if(choice == n + 1)
 			break;
-		else if(choice == n - 2)
+
+		else if(choice == n + 2)
 			teacher_form(database);
-		else {
-			sub_choice = teacher_submenu(database, choice);
-		}
+		
+		else if(choice == INT_MIN)
+			return INT_MIN;
+		
+		else if(choice == -1)
+			continue;
 	}
 	return 0;
 }
-int teacher_submenu(char *database,int index){
-	int i, c, n = 2, choice;
-	char *choices[] = {
-		"Remove Teacher",
-		"Edit Teacher",
-	};
-	WINDOW *win;
-	ITEM **items;
-	MENU *menu;
-	start_color();
-	cbreak();
-	noecho();
-	keypad(stdscr, TRUE);	
-	items = (ITEM **)calloc(n + 2, sizeof(ITEM *));
-	for(i = 0; i < n; ++i) {
-		items[i] = new_item(choices[i], NULL);
-	}
-	items[i] = new_item("Back",NULL);
-	n+=1;
-	menu = new_menu((ITEM **)items);
-	win = newwin(0, 0, 0, 0);
-	int y,x;
-	getmaxyx(win,y,x);
-	keypad(win, TRUE);
-	set_menu_win(menu, win);
-	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
-	set_menu_format(menu,x - 4, 1);
-	set_menu_mark(menu, " * ");
-	box(win, 0, 0);
-	print_in_middle(win, 1, 0, x,get_teacher(database, index).name, COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
-	mvwaddch(win, 2, x - 1, ACS_RTEE);
-	refresh();
-	post_menu(menu);
-	wrefresh(win);
-	choice = 0;
-	while((c = wgetch(win)))
-	{       switch(c)
-		{	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(choice != n -1)
-					choice++;
-				break;
 
-			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(choice != 0)
-					choice--;
-				break;
-			
-			case 10: /* Enter */
-				remove_menu(menu,items,n);
-				break;
-			
-			default:
-				break;
-		}
-		if(c == 10)
-			break;
-		wrefresh(win);
-	}	
-	return choice;
-}
 int teacher_menu(char *database){
-	int i, c, n, choice;
+	int i, c, n, choice = 0;
 	teacher *xteacher;
 	WINDOW *win;
 	ITEM **items;
@@ -227,9 +174,6 @@ int teacher_menu(char *database){
 		xteacher[i] = get_teacher(database,i);
 		items[i] = new_item(xteacher[i].name, NULL);
 	}
-	items[i] = new_item("Add Teacher",NULL);
-	items[i + 1] = new_item("Back",NULL);
-	n+=2;
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
 	int y,x;
@@ -239,42 +183,98 @@ int teacher_menu(char *database){
 	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
 	set_menu_format(menu,x - 4, 1);
 	set_menu_mark(menu, " * ");
+	set_menu_spacing(menu, 0, 2, 0);
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
+	mvwaddch(win, y - 3, 0, ACS_LTEE);
+	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
-	post_menu(menu);
-	wrefresh(win);
-	choice = 0;
-	while((c = wgetch(win)))
-	{       switch(c)
-		{	case KEY_DOWN:
-				menu_driver(menu, REQ_DOWN_ITEM);
-				if(choice != n -1)
-					choice++;
-				break;
-
-			case KEY_UP:
-				menu_driver(menu, REQ_UP_ITEM);
-				if(choice != 0)
-					choice--;
-				break;
-			
-			case 10: /* Enter */
-				remove_menu(menu,items,n);
-				break;
-			
-			default:
-				break;
-		}
-		if(c == 10)
-			break;
+	if(n) {
+	
+		if(n > 1)
+			mvwprintw(win,y - 2, 2,"N:New Teacher\t\tR:Remove Teacher\tS:Sort\t\tB:Back\tQ:Quit");
+		else
+			mvwprintw(win,y - 2, 2,"N:New Teacher\t\tR:Remove Teacher\tB:Back\tQ:Quit");
+		for(i = 0; i < choice; i++)
+			menu_driver(menu, REQ_DOWN_ITEM);
+		post_menu(menu);
 		wrefresh(win);
+		while((c = wgetch(win))){
+			switch(c) {	
+				case KEY_DOWN:
+					menu_driver(menu, REQ_DOWN_ITEM);
+					if(choice != n -1)
+						choice++;
+					break;
+
+				case KEY_UP:
+					menu_driver(menu, REQ_UP_ITEM);
+					if(choice != 0)
+						choice--;
+					break;
+			
+				case 10: /* Enter */
+					remove_menu(menu,items,n);
+					return choice;
+				case 'R':
+				case 'r':
+					remove_teacher(database, choice);		
+					remove_menu(menu,items,n);
+					return -1;	
+				case 'B':
+				case 'b':
+					remove_menu(menu,items,n);
+					return n + 1;			
+				case 'N':
+				case 'n':		
+					remove_menu(menu,items,n);
+					return n + 2;
+				case 'Q':
+				case 'q':		
+					remove_menu(menu,items,n);
+					return INT_MIN;
+				default:
+					break;
+			}
+			wrefresh(win);
+		}
+	}	
+	else {
+		mvwprintw(win,y - 2, 2,"N:New Teacher\t\tB:Back\t\tQ:Quit");
+		mvwprintw(win,5,3*x/7,"No Teachers found :(\n");
+		wrefresh(win);
+		curs_set(0);
+		while((c = wgetch(win)))
+		{
+			switch(c) {
+				case 'n':
+				case 'N':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return n+2;
+				case 'b':
+				case 'B':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return n+1;
+				case 'Q':
+				case 'q':		
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return INT_MIN;
+				default:
+					break;
+			}
+			
+			wrefresh(win);
+		}
 	}	
 	free(xteacher);
-	return choice;
+	return -1;
 }
 int teacher_form(char *database){
 	refresh();
