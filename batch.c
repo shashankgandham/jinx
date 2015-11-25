@@ -132,6 +132,7 @@ int batch_number(char *database) {
 
 int *find_batch_info(char *database, int index){
 
+	return 0;
 }
 int sort_batch(char *database , int(*compare)(const void *x ,const void *y)){
 
@@ -285,32 +286,42 @@ int batch_form(char *database){
 	int y,x;
 	start_color();
 	getmaxyx(stdscr,y,x);
-	win = newwin(6, 40, y/3, x/3);
+	win = newwin(0, 0, 0, 0);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, 40, "Enter the Name of Batch", COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(win, 2, 39, ACS_RTEE);
+	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Batch", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/3 + 3,x/3 + 2);
+	move(y/4 + 3,x/3 + 2);
 	scanw(" %[^\n]s",xbatch.name);
 	clear();
-	box(win, 0, 0);
-/*	print_in_middle(win, 1, 0, 40, "Enter the parent the batch", COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(win, 2, 39, ACS_RTEE);
-	wrefresh(win);
-	move(y/3 + 3,x/3 + 2);
-	scanw("%d",&xbatch.parent);*/
+	refresh();
 	xbatch.parent = -1;
-	print_in_middle(win, 1, 0, 40, "Enter the strength of the class", COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(win, 2, 39, ACS_RTEE);
+	box(win, 0, 0);
+	print_in_middle(win, y/4 + 1, 0, x, "Enter the strength of the batch", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/3 + 3,x/3 + 2);
+	move(y/4 + 3,x/3 + 2);	
 	scanw("%d",&xbatch.strength);
 	add_batch(database, &xbatch);
 	refresh();

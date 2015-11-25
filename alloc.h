@@ -23,6 +23,6 @@ typedef struct alloc{
 	int batch;
 	int slot;
 }alloc;
-void remove_menu(MENU *menu, ITEM **items, int n);
-void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color);
+
+
 #endif

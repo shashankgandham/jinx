@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "alloc.h"
+#include "database.h"
 #ifndef _SUBJECT_H
 #define _SUBJECT_H
 typedef struct subject{
@@ -36,7 +36,7 @@ int subject_number(char *database);
 /*Returns the number of subjects in the database */
 
 int *find_subject_info(char *database, int index);
-/*This function returns a list of subjects taught by the subject */ 
+/*This function returns a list of subjects taught by the subject */
 
 int sort_subject(char *database , int(*compare )(const void *x ,const void *y));
 /*This functon sorts the list of subjects according the compare function */

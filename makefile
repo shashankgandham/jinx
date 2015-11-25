@@ -1,28 +1,26 @@
 # Makefile for Timetable Generator by Shashank Gandham liscensed under GPLv2
-
-personal : remove	
+personal : jinx
 	@echo "The Program was compiled successfully and its details are :"
 	@echo "Lines Bytes Filename"
 	@wc -lc *.c *.h
-remove: jinx
-	rm *.o
-jinx: teacher.o batch.o subject.o room.o alloc.o database.o
-	@gcc -o jinx batch.o teacher.o subject.o room.o alloc.o database.o -lncurses -lgsl -lgslcblas -lmenu -g
 
-teacher.o: teacher.c
-	@gcc -c -Wall teacher.c -g
+jinx: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o
+	@gcc -o jinx .batch.o .teacher.o .subject.o .room.o .alloc.o .database.o -lncurses -lgsl -lgslcblas -lmenu -g
 
-batch.o: batch.c
-	@gcc -c -Wall batch.c -g
+.teacher.o: teacher.c
+	@gcc -c -Wall teacher.c -o .teacher.o -g
 
-subject.o: subject.c
-	@gcc -c -Wall subject.c -g
+.batch.o: batch.c
+	@gcc -c -Wall batch.c -o .batch.o -g
 
-room.o: room.c
-	@gcc -c -Wall room.c -g
+.subject.o: subject.c
+	@gcc -c -Wall subject.c -o .subject.o -g
 
-alloc.o: alloc.c
-	@gcc -c -Wall alloc.c -g
+.room.o: room.c
+	@gcc -c -Wall room.c -o .room.o -g
 
-database.o: database.c
-	@gcc -c -Wall database.c -g
+.alloc.o: alloc.c
+	@gcc -c -Wall alloc.c -o .alloc.o -g
+
+.database.o: database.c
+	@gcc -c -Wall database.c -o .database.o -g

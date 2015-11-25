@@ -13,11 +13,9 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
+#ifndef _TEACHER_H
 #define _TEACHER_H
-#ifndef _ALLOC_H
-	#include "alloc.h"
-#endif
-
+#include "database.h"
 typedef struct teacher{
 	int index;
 	char name[128];
@@ -37,7 +35,7 @@ int teacher_number(char *database);
 /*Returns the number of teachers in the database */
 
 int *find_teacher_info(char *database, int index);
-/*This function returns a list of subjects taught by the teacher */ 
+/*This function returns a list of subjects taught by the teacher */
 
 int sort_teacher(char *database , int(*compare )(const void *x ,const void *y));
 /*This functon sorts the list of teachers according the compare function */
@@ -52,3 +50,4 @@ int teacher_submenu(char *database,int index);
 
 int teacher_form(char *database);
 /*This handles all the forms of the teacher datastructure */
+#endif

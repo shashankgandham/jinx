@@ -27,6 +27,37 @@
 #include <signal.h>
 #include <limits.h>
 
+void remove_menu(MENU *menu, ITEM **items, int n) {
+	int i;
+	unpost_menu(menu);
+	free_menu(menu);
+	for(i = 0; i < n; ++i)
+		free_item(items[i]);
+	endwin();
+	clear();
+	refresh();
+}
+void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color) {	
+	int length, x, y;
+	float temp;
+	if(win == NULL)
+		win = stdscr;
+	getyx(win, y, x);
+	if(startx != 0)
+		x = startx;
+	if(starty != 0)
+		y = starty;
+	if(width == 0)
+		width = 80;
+
+	length = strlen(string);
+	temp = (width - length)/ 2;
+	x = startx + (int)temp;
+	wattron(win, color);
+	mvwprintw(win, y, x, "%s", string);
+	wattroff(win, color);
+	refresh();
+}
 int new_database(char *name) {
 	FILE *fp, *gp;
 	char database[128];
@@ -45,7 +76,7 @@ int new_database(char *name) {
 }
 int remove_database(char *data) {
 	FILE *fp, *gp;
-	char database[128];
+	char database[128],file[256];
 	int d, i = 0;
 	fp = fopen("Database/database.txt","r");
 	gp = fopen("Database/.database_temp.txt","w");
@@ -58,6 +89,26 @@ int remove_database(char *data) {
 	fclose(gp);
 	remove("Database/database.txt");
 	rename("Database/.database_temp.txt","Database/database.txt");
+	
+	strcpy(database,"Database/");
+	strcat(database,data);
+
+	strcpy(file,database);
+	strcat(file,"_teacher");
+	remove(file);
+
+	strcpy(file,database);
+	strcat(file,"_subject");
+	remove(file);
+
+	strcpy(file,database);
+	strcat(file,"_batch");
+	remove(file);
+
+	strcpy(file,database);
+	strcat(file,"_room");
+	remove(file);
+
 	return 1;
 }
 
@@ -69,15 +120,24 @@ void new_database_form() {
 	int y,x;
 	start_color();
 	getmaxyx(stdscr,y,x);
-	win = newwin(6, 40, y/3, x/3);
+	
+	win = newwin(0, 0, 0, 0);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, 40, "Enter the name of database", COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(win, 2, 39, ACS_RTEE);
+	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Database", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);	
 	wrefresh(win);
-	move(y/3 + 3,x/3 + 2);
+	move(y/4 + 3,x/3 + 2);	
 	scanw(" %[^\n]s",name);
 	new_database(name);
 	refresh();
@@ -122,7 +182,7 @@ int show_database_menu(char *database) {
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
-	
+
 	mvwaddch(win, y - 3, 0, ACS_LTEE);
 	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
@@ -148,12 +208,12 @@ int show_database_menu(char *database) {
 			case 10: /* Enter */
 				remove_menu(menu, items, n);
 				return choice;
-				break;	
-			
+				break;
+
 			case 'B':
 			case 'b':
 				remove_menu(menu, items, n);
-				return n+1;			
+				return n+1;
 			case 'q':
 			case 'Q':
 				remove_menu(menu, items, n);
@@ -264,12 +324,12 @@ begin_main_menu:
 		else
 			mvwprintw(win,y - 2, 2,"N:New Database\tR:Remove Database\tQ:Quit");
 		post_menu(menu);
-		wrefresh(win);	
+		wrefresh(win);
 		for(i = 0; i < choice; i++)
 			menu_driver(menu, REQ_DOWN_ITEM);
 
 		while((c = wgetch(win)))
-		{	
+		{
 			switch(c)
 			{	case KEY_DOWN:
 					menu_driver(menu, REQ_DOWN_ITEM);
@@ -305,7 +365,7 @@ begin_main_menu:
 					return -1;
 				default:
 					break;
-			}			
+			}
 			wrefresh(win);
 			if(signal(SIGWINCH, NULL) != SIG_ERR) {
 				remove_menu(menu,items, n);
@@ -337,7 +397,7 @@ begin_main_menu:
 				default:
 					break;
 			}
-			
+
 			if(signal(SIGWINCH, NULL) != SIG_ERR) {
 				wrefresh(win);
 				goto begin_main_menu;
@@ -347,10 +407,25 @@ begin_main_menu:
 	}
 	return -1;
 }
+int compare(const void *p, const void *q) {
+	char *a, *b;
+	a = (char *)p;
+	b = (char *)q;
+	return strcmp(a,b);
+}
 void sort_database() {
-	system("sort Database/database.txt -o Database/.database_temp.txt");
+	char database[128][128];
+	int i, n;
+	n = database_number();
+	for(i = 0; i < n; i++)
+		get_database(i,database[i]);
+	qsort(database,n,128,compare);
 	remove("Database/database.txt");
-	rename("Database/.database_temp.txt","Database/database.txt");
+	FILE *fp;
+	fp = fopen("Database/database.txt","w");
+	for(i = 0; i < n; i++)
+		fprintf(fp,"%s\n",database[i]);
+	fclose(fp);
 }
 
 int main() {
@@ -363,8 +438,8 @@ int main() {
 	noecho();
 	while(1) {
 		n = database_number();
-		choice = main_menu();	
-		
+		choice = main_menu();
+
 		if(choice == -1)
 			continue;
 
@@ -376,7 +451,7 @@ int main() {
 			new_database_form();
 		else if(choice == n + 3)
 			sort_database();
-		
+
 		else {
 			get_database(choice, database);
 			if(database_menu(database) == INT_MIN) {

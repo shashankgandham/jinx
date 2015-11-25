@@ -47,7 +47,7 @@ int remove_room(char *database, int index){
 	int n, i;
 	char file[64],temp_file[64];
 	n = room_number(database);
-	room xroom;	
+	room xroom;
 	strcpy(temp_file, "Database/");
 	strcat(temp_file, ".");
 	strcat(temp_file, database);
@@ -147,10 +147,10 @@ int start_room(char *database){
 
 		else if(choice == n + 2)
 			room_form(database);
-		
+
 		else if(choice == INT_MIN)
 			return INT_MIN;
-		
+
 		else if(choice == -1)
 			continue;
 	}
@@ -167,7 +167,7 @@ int room_menu(char *database){
 	start_color();
 	cbreak();
 	noecho();
-	keypad(stdscr, TRUE);	
+	keypad(stdscr, TRUE);
 	xroom = (room *)malloc(sizeof(room) * (n + 1));
 	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
 	for(i = 0; i < n; ++i) {
@@ -194,7 +194,7 @@ int room_menu(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-	
+
 		if(n > 1)
 			mvwprintw(win,y - 2, 2,"N:New Room\t\tR:Remove Room\tS:Sort\t\tB:Back\tQ:Quit");
 		else
@@ -204,7 +204,7 @@ int room_menu(char *database){
 		post_menu(menu);
 		wrefresh(win);
 		while((c = wgetch(win))){
-			switch(c) {	
+			switch(c) {
 				case KEY_DOWN:
 					menu_driver(menu, REQ_DOWN_ITEM);
 					if(choice != n -1)
@@ -216,25 +216,25 @@ int room_menu(char *database){
 					if(choice != 0)
 						choice--;
 					break;
-			
+
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
 				case 'R':
 				case 'r':
-					remove_room(database, choice);		
+					remove_room(database, choice);
 					remove_menu(menu,items,n);
-					return -1;	
+					return -1;
 				case 'B':
 				case 'b':
 					remove_menu(menu,items,n);
-					return n + 1;			
+					return n + 1;
 				case 'N':
-				case 'n':		
+				case 'n':
 					remove_menu(menu,items,n);
 					return n + 2;
 				case 'Q':
-				case 'q':		
+				case 'q':
 					remove_menu(menu,items,n);
 					return INT_MIN;
 				default:
@@ -242,7 +242,7 @@ int room_menu(char *database){
 			}
 			wrefresh(win);
 		}
-	}	
+	}
 	else {
 		mvwprintw(win,y - 2, 2,"N:New Room\t\tB:Back\t\tQ:Quit");
 		mvwprintw(win,5,3*x/7,"No Rooms found :(\n");
@@ -262,46 +262,63 @@ int room_menu(char *database){
 					curs_set(1);
 					return n+1;
 				case 'Q':
-				case 'q':		
+				case 'q':
 					remove_menu(menu,items,n);
 					curs_set(1);
 					return INT_MIN;
 				default:
 					break;
 			}
-			
+
 			wrefresh(win);
 		}
-	}	
+	}
 	free(xroom);
 	return -1;
 }
 int room_form(char *database){
-	refresh();
+		refresh();
 	room xroom;
 	echo();
 	WINDOW *win;
-	int y,x;	
+	int y,x;
 	start_color();
 	getmaxyx(stdscr,y,x);
-	win = newwin(6, 40, y/3, x/3);
+	win = newwin(0, 0, 0, 0);
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, 40, "Enter the Name of Room", COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(win, 2, 39, ACS_RTEE);
+	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Room", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/3 + 3,x/3 + 2);
+	move(y/4 + 3,x/3 + 2);
 	scanw(" %[^\n]s",xroom.name);
 	clear();
+	refresh();
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, 40, "Enter the weekly hours for the room", COLOR_PAIR(1));
-	mvwaddch(win, 2, 0, ACS_LTEE);
-	mvwhline(win, 2, 1, ACS_HLINE, 38);
-	mvwaddch(win, 2, 39, ACS_RTEE);
+	print_in_middle(win, y/4 + 1, 0, x, "Enter the capacity of the room", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/3 + 3,x/3 + 2);
+	move(y/4 + 3,x/3 + 2);	
 	scanw("%d",&xroom.capacity);
 	add_room(database, &xroom);
 	refresh();

@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "alloc.h"
+#include "database.h"
 #ifndef _ROOM_H
 #define _ROOM_H
 typedef struct room{
@@ -36,7 +36,7 @@ int room_number(char *database);
 /*Returns the number of rooms in the database */
 
 int *find_room_info(char *database, int index);
-/*This function returns a list of subjects taught by the room */ 
+/*This function returns a list of subjects taught by the room */
 
 int sort_room(char *database , int(*compare )(const void *x ,const void *y));
 /*This functon sorts the list of rooms according the compare function */

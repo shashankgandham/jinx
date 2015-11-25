@@ -13,7 +13,7 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "alloc.h"
+#include "database.h"
 #ifndef _BATCH_H
 #define _BATCH_H
 typedef struct batch{
@@ -36,7 +36,7 @@ int batch_number(char *database);
 /*Returns the number of batchs in the database */
 
 int *find_batch_info(char *database, int index);
-/*This function returns a list of subjects taught by the batch */ 
+/*This function returns a list of subjects taught by the batch */
 
 int sort_batch(char *database , int(*compare )(const void *x ,const void *y));
 /*This functon sorts the list of batchs according the compare function */
