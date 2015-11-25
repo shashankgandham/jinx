@@ -138,24 +138,97 @@ int *find_alloc_info(char *database, int index){
 int sort_alloc(char *database , int(*compare)(const void *x, const void *y)){ 	
 	return 0;
 }
+int show_alloc_info(char *database, int choice) {
+	int c;
+	alloc xalloc;
+	teacher xteacher;
+	subject xsubject;
+	batch xbatch;
+	xalloc = get_alloc(database, choice);
+	xteacher = get_teacher(database,get_array_index(database,2,xalloc.teacher));
+	xbatch = get_batch(database,get_array_index(database,0,xalloc.batch));
+	xsubject = get_subject(database,get_array_index(database,1,xalloc.subject));
+	refresh();
+	noecho();
+	curs_set(0);
+	WINDOW *win;
+	int y,x;
+	start_color();
+	getmaxyx(stdscr,y,x);
+	win = newwin(0, 0, 0, 0);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	box(win, 0, 0);
+	print_in_middle(win, y/4 + 1, 0, x, "Info", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
+	wrefresh(win);
+	mvwaddch(win, y - 3, 0, ACS_LTEE);
+	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
+	move(y/4 + 3,x/3 + 2);
+	printw("Batch - %s",xbatch.name);
+	move(y/4 + 5,x/3 + 2);
+	printw("Subject - %s",xsubject.name);
+	move(y/4 + 7,x/3 + 2);
+	printw("Teacher - %s",xteacher.name);
+	mvwprintw(win,y - 2, 2,"B:Back\tQ:Quit");
+	refresh();
+	while((c = wgetch(win))){
+		switch(c) {	
+			case KEY_DOWN:
+			case KEY_UP:
+				return 0;
+			case 'B':
+			case 'b':
+				curs_set(1);
+				return 1;
+			case 'Q':
+			case 'q':
+				curs_set(1);
+				return INT_MIN;
+			default:
+				break;
+		}
+		wrefresh(win);
+	}
+	curs_set(1);
+	return 0;
+}
 int start_alloc(char *database){
-	int choice, n;
+	int choice, n, sub_choice;
 	while(1) {
 		choice = alloc_menu(database);
 		n = alloc_number(database);
+
 		if(choice == n + 1)
 			break;
 
 		else if(choice == n + 2)
 			alloc_form(database);
-		
+
 		else if(choice == INT_MIN)
 			return INT_MIN;
 
 		else if(choice == -1)
 			continue;
-		else
-			continue;
+		else {	
+			while(1) {	
+				sub_choice = show_alloc_info(database, choice);
+				if(sub_choice == 1)
+					break;
+				if(sub_choice == INT_MIN)
+					return INT_MIN;
+			}
+		}
 	}
 	return 0;
 }
@@ -175,7 +248,6 @@ int alloc_menu(char *database){
 	choices = (char **)malloc(sizeof(char *) * n + 1);
 	description = (char **)malloc(sizeof(char *) * n + 1);
 	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
-	
 	for(i = 0; i <= n; ++i) {
 		choices[i] = (char *)malloc(sizeof(char) * 64);
 		description[i] = (char *)malloc(sizeof(char) * 128);
@@ -209,8 +281,8 @@ int alloc_menu(char *database){
 	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
-	if(n > 1) {
-		if(n > 2)
+	if(n) {
+		if(n > 1)
 			mvwprintw(win,y - 2, 2,"N:New Allocation\t\tR:Remove Allocation\tS:Sort\t\tB:Back\tQ:Quit");
 		else
 			mvwprintw(win,y - 2, 2,"N:New Allocation\t\tR:Remove Allocation\tB:Back\tQ:Quit");

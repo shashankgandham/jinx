@@ -136,8 +136,63 @@ int sort_room(char *database , int(*compare)(const void *x ,const void *y)){
 
 	return 0;
 }
+int show_room_info(char *database, int choice) {
+	int c;
+	room xroom;
+	xroom = get_room(database,choice);
+	refresh();
+	noecho();
+	curs_set(0);
+	WINDOW *win;
+	int y,x;
+	start_color();
+	getmaxyx(stdscr,y,x);
+	win = newwin(0, 0, 0, 0);
+	init_pair(1, COLOR_RED, COLOR_BLACK);
+	box(win, 0, 0);
+	print_in_middle(win, y/4 + 1, 0, x, "Info", COLOR_PAIR(1));
+	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
+	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
+	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
+	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
+	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
+	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
+	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
+	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
+	wrefresh(win);
+	mvwaddch(win, y - 3, 0, ACS_LTEE);
+	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
+	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
+	move(y/4 + 3,x/3 + 2);
+	printw("Name - %s",xroom.name);
+	move(y/4 + 5,x/3 + 2);
+	printw("Max Capacity - %d",xroom.capacity);
+	mvwprintw(win,y - 2, 2,"B:Back\tQ:Quit");
+	refresh();
+	while((c = wgetch(win))){
+		switch(c) {	
+			case KEY_DOWN:
+			case KEY_UP:
+				return 0;
+			case 'B':
+			case 'b':
+				curs_set(1);
+				return 1;
+			case 'Q':
+			case 'q':
+				curs_set(1);
+				return INT_MIN;
+			default:
+				break;
+		}
+	}
+	return 0;
+}
 int start_room(char *database){
-	int choice, n;
+	int choice, n, sub_choice;
 	while(1) {
 		choice = room_menu(database);
 		n = room_number(database);
@@ -153,6 +208,15 @@ int start_room(char *database){
 
 		else if(choice == -1)
 			continue;
+		else{
+			while(1) {
+				sub_choice = show_room_info(database, choice);
+				if(sub_choice == 1)
+					break;
+				if(sub_choice == INT_MIN)
+					return INT_MIN;
+			}
+		}
 	}
 	return 0;
 }
