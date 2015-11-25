@@ -48,7 +48,7 @@ int add_alloc(char *database, alloc *xalloc) {
 int remove_alloc(char *database, int index){
 	FILE *fp;
 	int n, i;
-	char file[64],temp_file[64];
+	char file[63],temp_file[64];
 	n = alloc_number(database);
 	alloc xalloc;
 	strcpy(temp_file, "Database/");
@@ -143,17 +143,18 @@ int start_alloc(char *database){
 	while(1) {
 		choice = alloc_menu(database);
 		n = alloc_number(database);
-
 		if(choice == n + 1)
 			break;
 
 		else if(choice == n + 2)
 			alloc_form(database);
-
+		
 		else if(choice == INT_MIN)
 			return INT_MIN;
 
 		else if(choice == -1)
+			continue;
+		else
 			continue;
 	}
 	return 0;
@@ -174,10 +175,20 @@ int alloc_menu(char *database){
 	choices = (char **)malloc(sizeof(char *) * n + 1);
 	description = (char **)malloc(sizeof(char *) * n + 1);
 	items = (ITEM **)calloc(n + 3, sizeof(ITEM *));
-	for(i = 0; i < n; ++i) {
-		xalloc = get_alloc(database,i);
-		strcpy(choices, get_batch(database, get_array_index(database, 0, xalloc.batch)).name);
-		items[i] = new_item(choices[i], NULL);
+	
+	for(i = 0; i <= n; ++i) {
+		choices[i] = (char *)malloc(sizeof(char) * 64);
+		description[i] = (char *)malloc(sizeof(char) * 128);
+		if(i) {
+			xalloc = get_alloc(database,i - 1);
+			strcpy(choices[i], get_batch(database, get_array_index(database, 0, xalloc.batch)).name);
+			strcpy(description[i], get_subject(database, get_array_index(database, 1, xalloc.subject)).name);
+		}
+		else {
+			strcpy(choices[i],"Batch");
+			strcpy(description[i],"Subject");
+		}
+		items[i] = new_item(choices[i], description[i]);
 	}
 	menu = new_menu((ITEM **)items);
 	win = newwin(0, 0, 0, 0);
@@ -185,10 +196,10 @@ int alloc_menu(char *database){
 	getmaxyx(win,y,x);
 	keypad(win, TRUE);
 	set_menu_win(menu, win);
-	set_menu_sub(menu, derwin(win, y - 5, 38, 5, 0.4*x));
-	set_menu_format(menu,x - 4, 1);
+	set_menu_sub(menu, derwin(win, y - 5, 0.5*x, 5, 0.4*x));
+	set_menu_format(menu, x - 4 , 1);
 	set_menu_mark(menu, " * ");
-	set_menu_spacing(menu, 0, 2, 0);
+	set_menu_spacing(menu, 8, 2, 0);
 	box(win, 0, 0);
 	print_in_middle(win, 1, 0, x, "Allocations" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
@@ -198,9 +209,8 @@ int alloc_menu(char *database){
 	mvwhline(win, y - 3, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
-	if(n) {
-
-		if(n > 1)
+	if(n > 1) {
+		if(n > 2)
 			mvwprintw(win,y - 2, 2,"N:New Allocation\t\tR:Remove Allocation\tS:Sort\t\tB:Back\tQ:Quit");
 		else
 			mvwprintw(win,y - 2, 2,"N:New Allocation\t\tR:Remove Allocation\tB:Back\tQ:Quit");
@@ -208,6 +218,7 @@ int alloc_menu(char *database){
 			menu_driver(menu, REQ_DOWN_ITEM);
 		post_menu(menu);
 		wrefresh(win);
+		menu_driver(menu, REQ_DOWN_ITEM);
 		while((c = wgetch(win))){
 			switch(c) {
 				case KEY_DOWN:
@@ -217,9 +228,10 @@ int alloc_menu(char *database){
 					break;
 
 				case KEY_UP:
-					menu_driver(menu, REQ_UP_ITEM);
-					if(choice != 0)
+					if(choice != 0) {
+						menu_driver(menu, REQ_UP_ITEM);
 						choice--;
+					}
 					break;
 
 				case 10: /* Enter */
@@ -352,6 +364,31 @@ int alloc_teacher(char *database){
 			wrefresh(win);
 		}
 	}
+	else {
+		mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
+		mvwprintw(win,5,3*x/7,"No Teachers found\n");
+		wrefresh(win);
+		curs_set(0);
+		while((c = wgetch(win)))
+		{
+			switch(c) {
+				case 'b':
+				case 'B':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return -1;
+				case 'Q':
+				case 'q':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return INT_MIN;
+				default:
+					break;
+			}
+
+			wrefresh(win);
+		}
+	}
 	free(xteacher);
 	endwin();
 	clear();
@@ -386,7 +423,7 @@ int alloc_subject(char *database){
 	set_menu_mark(menu, " * ");
 	set_menu_spacing(menu, 0, 2, 0);
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
+	print_in_middle(win, 1, 0, x, "Subjects" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
@@ -427,6 +464,31 @@ int alloc_subject(char *database){
 				default:
 					break;
 			}
+			wrefresh(win);
+		}
+	}	
+	else {
+		mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
+		mvwprintw(win,5,3*x/7,"No Subjects found\n");
+		wrefresh(win);
+		curs_set(0);
+		while((c = wgetch(win)))
+		{
+			switch(c) {
+				case 'b':
+				case 'B':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return -1;
+				case 'Q':
+				case 'q':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return INT_MIN;
+				default:
+					break;
+			}
+
 			wrefresh(win);
 		}
 	}
@@ -464,7 +526,7 @@ int alloc_batch(char *database){
 	set_menu_mark(menu, " * ");
 	set_menu_spacing(menu, 0, 2, 0);
 	box(win, 0, 0);
-	print_in_middle(win, 1, 0, x, "Teachers" , COLOR_PAIR(1));
+	print_in_middle(win, 1, 0, x, "Batches" , COLOR_PAIR(1));
 	mvwaddch(win, 2, 0, ACS_LTEE);
 	mvwhline(win, 2, 1, ACS_HLINE, x - 2);
 	mvwaddch(win, 2, x - 1, ACS_RTEE);
@@ -507,6 +569,31 @@ int alloc_batch(char *database){
 			}
 			wrefresh(win);
 		}
+	}	
+	else {
+		mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
+		mvwprintw(win,5,3*x/7,"No Batches found\n");
+		wrefresh(win);
+		curs_set(0);
+		while((c = wgetch(win)))
+		{
+			switch(c) {
+				case 'b':
+				case 'B':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return -1;
+				case 'Q':
+				case 'q':
+					remove_menu(menu,items,n);
+					curs_set(1);
+					return INT_MIN;
+				default:
+					break;
+			}
+
+			wrefresh(win);
+		}
 	}
 	free(xbatch);
 	endwin();
@@ -535,6 +622,7 @@ int get_index(char *database, int datum, int index) {
 		       return -1;	
 		return get_room(database, index).index;
 	}
+	return -1;
 }
 int get_array_index(char *database, int datum, int index) {
 	int i, n;	
@@ -562,13 +650,29 @@ int get_array_index(char *database, int datum, int index) {
 		if(get_room(database, index).index == index)
 			return i;	
 	}	
+	return -1;
 }
 
 int alloc_form(char *database) {
 	alloc xalloc;
-	xalloc.teacher = get_index(database, 2, alloc_teacher(database));
-	xalloc.subject = get_index(database, 1, alloc_subject(database));
-	xalloc.batch = get_index(database, 0, alloc_batch(database));
+	int n;
+	n = alloc_batch(database);	
+	if(n == -1 || n == batch_number(database) + 1)
+		return 1;
+	xalloc.batch = get_index(database, 0, n);
+		
+	n = alloc_subject(database);	
+	if(n == -1 || n == subject_number(database) + 1)
+		return 1;
+	xalloc.subject = get_index(database, 1, n);
+
+
+	n = alloc_teacher(database);	
+	if(n == -1 || n == teacher_number(database) + 1)
+		return 1;
+	xalloc.teacher = get_index(database, 2, n);
+	
+	xalloc.slot = 1;
 	add_alloc(database, &xalloc);
 	return 0;
 }

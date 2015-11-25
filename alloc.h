@@ -56,5 +56,6 @@ int alloc_form(char *database);
 int alloc_teacher(char *database);
 int alloc_batch(char *database);
 int alloc_subject(char *database);
-
+int get_array_index(char *database, int datum, int index);
+int get_index(char *database, int datum, int index);
 #endif
