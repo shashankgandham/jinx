@@ -22,6 +22,7 @@ typedef struct teacher{
 	int week_time;
 }teacher;
 
+int add_teacher(char *database, teacher *xteacher);
 /*This function adds a teacher to the database */
 
 int remove_teacher(char *database, int index);

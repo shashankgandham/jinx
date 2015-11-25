@@ -18,6 +18,7 @@
 #include "subject.h"
 #include "batch.h"
 #include "room.h"
+#include "alloc.h"
 #include <stdio.h>
 #include <string.h>
 #include <menu.h>
@@ -240,6 +241,8 @@ int database_menu(char *database) {
 			exit = start_batch(database);
 		if(choice == 3)
 			exit = start_room(database);
+		if(choice == 4)
+			exit = start_alloc(database);
 		if(choice == n + 1)
 			return 0;
 		if(exit == INT_MIN || choice == INT_MIN)

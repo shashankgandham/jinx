@@ -24,3 +24,5 @@ jinx: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o
 
 .database.o: database.c
 	@gcc -c -Wall database.c -o .database.o -g
+clean:
+	rm .*.o

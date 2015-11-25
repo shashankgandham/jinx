@@ -20,7 +20,7 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
 int new_database(char *name);
 void new_database_form();
 int show_database_menu(char *database);
-void database_menu(char *database);
+int database_menu(char *database);
 void get_database(int choice, char *choices);
 int database_number();
 int main_menu();
