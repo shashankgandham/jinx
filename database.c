@@ -348,7 +348,7 @@ begin_main_menu:
 				case 10:
 					remove_menu(menu, items, n);
 					return choice;
-				break;
+					break;
 				case 'n':
 				case 'N':
 					remove_menu(menu,items, n);
