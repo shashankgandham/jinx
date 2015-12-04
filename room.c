@@ -1,27 +1,21 @@
-
 /*  This file is part of Jinx originally written by Shashank gandham.
-
     Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
-
     Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "room.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <limits.h>
-
 int add_room(char *database, room *xroom) {
 	FILE *fp;
 	int n;
@@ -129,11 +123,7 @@ int room_number(char *database) {
 	fclose(fp);
 	return n;
 }
-int *find_room_info(char *database, int index){
-	return 0;
-}
 int sort_room(char *database , int(*compare)(const void *x ,const void *y)){
-
 	return 0;
 }
 int show_room_info(char *database, int choice) {
@@ -173,7 +163,7 @@ int show_room_info(char *database, int choice) {
 	mvwprintw(win,y - 2, 2,"B:Back\tQ:Quit");
 	refresh();
 	while((c = wgetch(win))){
-		switch(c) {	
+		switch(c) {
 			case KEY_DOWN:
 			case KEY_UP:
 				return 0;
@@ -184,11 +174,13 @@ int show_room_info(char *database, int choice) {
 			case 'Q':
 			case 'q':
 				curs_set(1);
-				return INT_MIN;
+				return INT_MIN;			
 			default:
 				break;
 		}
+		wrefresh(win);
 	}
+	curs_set(1);
 	return 0;
 }
 int start_room(char *database){
@@ -196,16 +188,12 @@ int start_room(char *database){
 	while(1) {
 		choice = room_menu(database);
 		n = room_number(database);
-
 		if(choice == n + 1)
 			break;
-
 		else if(choice == n + 2)
 			room_form(database);
-
 		else if(choice == INT_MIN)
 			return INT_MIN;
-
 		else if(choice == -1)
 			continue;
 		else{
@@ -220,7 +208,6 @@ int start_room(char *database){
 	}
 	return 0;
 }
-
 int room_menu(char *database){
 	int i, c, n, choice = 0;
 	room *xroom;
@@ -258,7 +245,6 @@ int room_menu(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-
 		if(n > 1)
 			mvwprintw(win,y - 2, 2,"N:New Room\t\tR:Remove Room\tS:Sort\t\tB:Back\tQ:Quit");
 		else
@@ -274,13 +260,11 @@ int room_menu(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
@@ -333,7 +317,6 @@ int room_menu(char *database){
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -382,7 +365,7 @@ int room_form(char *database){
 	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
 	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);	
+	move(y/4 + 3,x/3 + 2);
 	scanw("%d",&xroom.capacity);
 	add_room(database, &xroom);
 	refresh();

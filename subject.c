@@ -1,25 +1,20 @@
 /*  This file is part of Jinx originally written by Shashank gandham.
-
     Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
-
     Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "subject.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
-
 int add_subject(char *database, subject *xsubject) {
 	FILE *fp;
 	int n;
@@ -127,11 +122,7 @@ int subject_number(char *database) {
 	fclose(fp);
 	return n;
 }
-int *find_subject_info(char *database, int index){
-	return 0;
-}
 int sort_subject(char *database , int(*compare)(const void *x ,const void *y)){
-
 	return 0;
 }
 int show_subject_info(char *database, int choice) {
@@ -170,10 +161,10 @@ int show_subject_info(char *database, int choice) {
 	printw("Slot Length - %d",xsubject.slot_len);
 	move(y/4 + 7,x/3 + 2);
 	printw("No. of slots per week - %d",xsubject.slot_per_week);
-	mvwprintw(win,y - 2, 2,"B:Back\tQ:Quit");
+	mvwprintw(win,y - 2, 2,"A:Add Allocation\t\tB:Back\tQ:Quit");
 	refresh();
 	while((c = wgetch(win))){
-		switch(c) {	
+		switch(c) {
 			case KEY_DOWN:
 			case KEY_UP:
 				return 0;
@@ -185,6 +176,10 @@ int show_subject_info(char *database, int choice) {
 			case 'q':
 				curs_set(1);
 				return INT_MIN;
+			case 'A':
+			case 'a':
+				curs_set(1);
+				return 2;
 			default:
 				break;
 		}
@@ -196,29 +191,28 @@ int start_subject(char *database){
 	while(1) {
 		choice = subject_menu(database);
 		n = subject_number(database);
-
 		if(choice == n + 1)
 			break;
-
 		else if(choice == n + 2)
 			subject_form(database);
-
 		else if(choice == INT_MIN)
 			return INT_MIN;
-
 		else if(choice == -1)
 			continue;
 		else {
-			sub_choice = show_subject_info(database, choice);
-			if(sub_choice == 1)
-				break;
-			if(sub_choice == INT_MIN)
-				return INT_MIN;
+			while(1) {
+				sub_choice = show_subject_info(database, choice);
+				if(sub_choice == 1)
+					break;
+				if(sub_choice == INT_MIN)
+					return INT_MIN;
+				if(sub_choice == 2)
+					alloc_form_subject(database, choice);
+			}
 		}
 	}
 	return 0;
 }
-
 int subject_menu(char *database){
 	int i, c, n, choice = 0;
 	subject *xsubject;
@@ -256,7 +250,6 @@ int subject_menu(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-
 		if(n > 1)
 			mvwprintw(win,y - 2, 2,"N:New Subject\t\tR:Remove Subject\tS:Sort\t\tB:Back\tQ:Quit");
 		else
@@ -272,13 +265,11 @@ int subject_menu(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
@@ -331,7 +322,6 @@ int subject_menu(char *database){
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -380,10 +370,10 @@ int subject_form(char *database){
 	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
 	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);	
+	move(y/4 + 3,x/3 + 2);
 	scanw("%d",&xsubject.slot_len);
 	clear();
-	refresh();	
+	refresh();
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the number of slots per week ", COLOR_PAIR(1));
 	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
@@ -398,7 +388,7 @@ int subject_form(char *database){
 	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
 	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);	
+	move(y/4 + 3,x/3 + 2);
 	scanw("%d",&xsubject.slot_per_week);
 	add_subject(database, &xsubject);
 	refresh();

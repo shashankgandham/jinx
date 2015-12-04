@@ -1,19 +1,15 @@
 /*  This file is part of Jinx originally written by Shashank Gandham.
-
     Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
-
     Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "alloc.h"
 #include "teacher.h"
 #include "batch.h"
@@ -24,7 +20,6 @@
 #include <string.h>
 #include <signal.h>
 #include <limits.h>
-
 int add_alloc(char *database, alloc *xalloc) {
 	FILE *fp;
 	int n;
@@ -135,7 +130,7 @@ int alloc_number(char *database) {
 int *find_alloc_info(char *database, int index){
 	return 0;
 }
-int sort_alloc(char *database , int(*compare)(const void *x, const void *y)){ 	
+int sort_alloc(char *database , int(*compare)(const void *x, const void *y)){
 	return 0;
 }
 int show_alloc_info(char *database, int choice) {
@@ -183,7 +178,7 @@ int show_alloc_info(char *database, int choice) {
 	mvwprintw(win,y - 2, 2,"B:Back\tQ:Quit");
 	refresh();
 	while((c = wgetch(win))){
-		switch(c) {	
+		switch(c) {
 			case KEY_DOWN:
 			case KEY_UP:
 				return 0;
@@ -208,20 +203,16 @@ int start_alloc(char *database){
 	while(1) {
 		choice = alloc_menu(database);
 		n = alloc_number(database);
-
 		if(choice == n + 1)
 			break;
-
 		else if(choice == n + 2)
 			alloc_form(database);
-
 		else if(choice == INT_MIN)
 			return INT_MIN;
-
 		else if(choice == -1)
 			continue;
-		else {	
-			while(1) {	
+		else{
+			while(1) {
 				sub_choice = show_alloc_info(database, choice);
 				if(sub_choice == 1)
 					break;
@@ -232,7 +223,6 @@ int start_alloc(char *database){
 	}
 	return 0;
 }
-
 int alloc_menu(char *database){
 	int i, c, n, choice = 0;
 	alloc xalloc;
@@ -253,8 +243,8 @@ int alloc_menu(char *database){
 		description[i] = (char *)malloc(sizeof(char) * 128);
 		if(i) {
 			xalloc = get_alloc(database,i - 1);
-			strcpy(choices[i], get_batch(database, get_array_index(database, 0, xalloc.batch)).name);
-			strcpy(description[i], get_subject(database, get_array_index(database, 1, xalloc.subject)).name);
+			strcpy(choices[i],get_batch(database, get_array_index(database, 0, xalloc.batch)).name);
+			strcpy(description[i],get_subject(database, get_array_index(database, 1, xalloc.subject)).name);
 		}
 		else {
 			strcpy(choices[i],"Batch");
@@ -298,14 +288,12 @@ int alloc_menu(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					if(choice != 0) {
 						menu_driver(menu, REQ_UP_ITEM);
 						choice--;
 					}
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
@@ -358,7 +346,6 @@ int alloc_menu(char *database){
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -401,7 +388,7 @@ int alloc_teacher(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-		mvwprintw(win,y - 2, 2,"Enter:Select\tB:Back\tQ:Quit");
+		mvwprintw(win,y - 2, 2,"A:Allocate to a new Teacher\tEnter:Select\tB:Back\tQ:Quit");
 		post_menu(menu);
 		wrefresh(win);
 		while((c = wgetch(win))){
@@ -411,17 +398,18 @@ int alloc_teacher(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
-
+				case 'A':
+				case 'a':
+					return n + 2;
+					break;
 				case 'B':
 				case 'b':
 					remove_menu(menu,items,n);
@@ -437,18 +425,23 @@ int alloc_teacher(char *database){
 		}
 	}
 	else {
-		mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
+		mvwprintw(win,y - 2, 2,"A:Allocate to a new Teacher\tB:Back\t\tQ:Quit");
 		mvwprintw(win,5,3*x/7,"No Teachers found\n");
 		wrefresh(win);
 		curs_set(0);
 		while((c = wgetch(win)))
 		{
 			switch(c) {
+				case 'A':
+				case 'a':
+					curs_set(1);
+					return n + 2;
+					break;
 				case 'b':
 				case 'B':
 					remove_menu(menu,items,n);
 					curs_set(1);
-					return -1;
+					return n +1;
 				case 'Q':
 				case 'q':
 					remove_menu(menu,items,n);
@@ -457,7 +450,6 @@ int alloc_teacher(char *database){
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -504,7 +496,7 @@ int alloc_subject(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-		mvwprintw(win,y - 2, 2,"Enter:Select\tB:Back\tQ:Quit");
+		mvwprintw(win,y - 2, 2,"A:Allocate a new Subject\tB:Back\t\tQ:Quit");
 		post_menu(menu);
 		wrefresh(win);
 		while((c = wgetch(win))){
@@ -514,17 +506,18 @@ int alloc_subject(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
-
+				case 'A':
+				case 'a':
+					return n + 2;
+					break;
 				case 'B':
 				case 'b':
 					remove_menu(menu,items,n);
@@ -538,20 +531,25 @@ int alloc_subject(char *database){
 			}
 			wrefresh(win);
 		}
-	}	
+	}
 	else {
-		mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
+		mvwprintw(win,y - 2, 2,"A:Allocate a new Subject\tB:Back\t\tQ:Quit");
 		mvwprintw(win,5,3*x/7,"No Subjects found\n");
 		wrefresh(win);
 		curs_set(0);
 		while((c = wgetch(win)))
 		{
 			switch(c) {
+				case 'A':
+				case 'a':
+					curs_set(1);
+					return n + 2;
+					break;
 				case 'b':
 				case 'B':
 					remove_menu(menu,items,n);
 					curs_set(1);
-					return -1;
+					return n + 1;
 				case 'Q':
 				case 'q':
 					remove_menu(menu,items,n);
@@ -560,7 +558,6 @@ int alloc_subject(char *database){
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -607,7 +604,7 @@ int alloc_batch(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-		mvwprintw(win,y - 2, 2,"Enter:Select\tB:Back\tQ:Quit");
+		mvwprintw(win,y - 2, 2,"A:Allocate to new Batch\tB:Back\t\tQ:Quit");
 		post_menu(menu);
 		wrefresh(win);
 		while((c = wgetch(win))){
@@ -617,17 +614,18 @@ int alloc_batch(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
-
+				case 'A':
+				case 'a':
+					return n + 2;
+					break;
 				case 'B':
 				case 'b':
 					remove_menu(menu,items,n);
@@ -641,29 +639,32 @@ int alloc_batch(char *database){
 			}
 			wrefresh(win);
 		}
-	}	
+	}
 	else {
-		mvwprintw(win,y - 2, 2,"B:Back\t\tQ:Quit");
+		mvwprintw(win,y - 2, 2,"A:Allocate to new Batch\tB:Back\t\tQ:Quit");
 		mvwprintw(win,5,3*x/7,"No Batches found\n");
 		wrefresh(win);
 		curs_set(0);
-		while((c = wgetch(win)))
-		{
+		while((c = wgetch(win))) {
 			switch(c) {
 				case 'b':
 				case 'B':
 					remove_menu(menu,items,n);
 					curs_set(1);
-					return -1;
+					return n + 1;
 				case 'Q':
 				case 'q':
 					remove_menu(menu,items,n);
 					curs_set(1);
 					return INT_MIN;
+				case 'A':
+				case 'a':
+					curs_set(1);
+					return n + 2;
+					break;
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -676,74 +677,157 @@ int alloc_batch(char *database){
 int get_index(char *database, int datum, int index) {
 	if(datum == 2) {
 		if(index > teacher_number(database))
-		       return -1;	
+		       return -1;
 		return get_teacher(database, index).index;
 	}
 	if(datum == 0) {
 		if(index > batch_number(database))
-		       return -1;	
+		       return -1;
 		return get_batch(database, index).index;
-	}	
+	}
 	if(datum == 1) {
 		if(index > subject_number(database))
-		       return -1;	
+		       return -1;
 		return get_subject(database, index).index;
-	}	
+	}
 	if(datum == 3) {
 		if(index > room_number(database))
-		       return -1;	
+		       return -1;
 		return get_room(database, index).index;
 	}
 	return -1;
 }
 int get_array_index(char *database, int datum, int index) {
-	int i, n;	
+	int i, n;
 	if(datum == 2) {
 		n = teacher_number(database);
-		for(i = 0; i < n; i++)
-		if(get_teacher(database, index).index == index)
-			return i;
+		for(i = 0; i < n; i++) {
+			if(get_teacher(database, i).index == index)
+				return i;
+		}
 	}
 	if(datum == 0) {
 		n = batch_number(database);
-		for(i = 0; i < n; i++)
-		if(get_batch(database, index).index == index)
-			return i;	
-	}	
+		for(i = 0; i < n; i++) {
+			if(get_batch(database, i).index == index)
+				return i;
+		}
+	}
 	if(datum == 1) {
 		n = subject_number(database);
-		for(i = 0; i < n; i++)
-		if(get_subject(database, index).index == index)
-			return i;	
-	}	
+		for(i = 0; i < n; i++) {
+			if(get_subject(database, i).index == index)
+				return i;
+		}
+	}
 	if(datum == 3) {
 		n = teacher_number(database);
-		for(i = 0; i < n; i++)
-		if(get_room(database, index).index == index)
-			return i;	
-	}	
+		for(i = 0; i < n; i++) {
+			if(get_room(database, i).index == index)
+				return i;
+		}
+	}
 	return -1;
 }
-
 int alloc_form(char *database) {
 	alloc xalloc;
 	int n;
-	n = alloc_batch(database);	
-	if(n == -1 || n == batch_number(database) + 1)
+	n = alloc_batch(database);
+	if(n == batch_number(database) + 1)
 		return 1;
+	if(n == batch_number(database) + 2) {
+		batch_form(database);
+		n-=1;
+	}
 	xalloc.batch = get_index(database, 0, n);
-		
-	n = alloc_subject(database);	
-	if(n == -1 || n == subject_number(database) + 1)
+	n = alloc_subject(database);
+	if(n == subject_number(database) + 1)
 		return 1;
+	if(n == subject_number(database) + 2) {
+		subject_form(database);
+		n-=1;
+	}
 	xalloc.subject = get_index(database, 1, n);
-
-
-	n = alloc_teacher(database);	
+	n = alloc_teacher(database);
+	if(n == teacher_number(database) + 1)
+		return 1;
+	if(n == teacher_number(database) + 2) {
+		teacher_form(database);
+		n-=1;
+	}
+	xalloc.teacher = get_index(database, 2, n);
+	xalloc.slot = 1;
+	add_alloc(database, &xalloc);
+	return 0;
+}
+int alloc_form_teacher(char *database, int index) {
+	alloc xalloc;
+	int n;
+	n = alloc_batch(database);
+	if(n == batch_number(database) + 1)
+		return 1;
+	if(n == batch_number(database) + 2) {
+		batch_form(database);
+		n-=1;
+	}
+	xalloc.batch = get_index(database, 0, n);
+	n = alloc_subject(database);
+	if(n == subject_number(database) + 1)
+		return 1;
+	if(n == subject_number(database) + 2) {
+		subject_form(database);
+		n-=1;
+	}
+	xalloc.subject = get_index(database, 1, n);
+	xalloc.teacher = get_index(database, 2, index);
+	xalloc.slot = 1;
+	add_alloc(database, &xalloc);
+	return 0;
+}
+int alloc_form_subject(char *database, int index) {
+	alloc xalloc;
+	int n;
+	n = alloc_batch(database);
+	if(n == batch_number(database) + 1)
+		return 1;
+	if(n == batch_number(database) + 2) {
+		batch_form(database);
+		n-=1;
+	}
+	xalloc.batch = get_index(database, 0, n);
+	xalloc.subject = get_index(database, 1, index);
+	n = alloc_teacher(database);
 	if(n == -1 || n == teacher_number(database) + 1)
 		return 1;
+	if(n == teacher_number(database) + 2) {
+		teacher_form(database);
+		n-=1;
+	}
 	xalloc.teacher = get_index(database, 2, n);
-	
+	xalloc.slot = 1;
+	add_alloc(database, &xalloc);
+	return 0;
+}
+int alloc_form_batch(char *database, int index) {
+	alloc xalloc;
+	int n;
+	xalloc.batch = get_index(database, 0, index);
+	n = alloc_subject(database);
+	if(n == subject_number(database) + 1)
+		return 1;
+	if(n == subject_number(database) + 2) {
+		subject_form(database);
+		n-=1;
+	}
+	xalloc.subject = get_index(database, 1, n);
+	n = alloc_teacher(database);
+	if(n == -1 || n == teacher_number(database) + 1)
+		return 1;
+	if(n == teacher_number(database) + 2) {
+		teacher_form(database);
+		n-=1;
+	}
+	xalloc.teacher = get_index(database, 2, n);
 	xalloc.slot = 1;
 	add_alloc(database, &xalloc);
 	return 0;

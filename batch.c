@@ -1,19 +1,15 @@
 /*  This file is part of Jinx originally written by Shashank gandham.
-
     Timetable Generator is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 2 of the License, or
     (at your option) any later version.
-
     Timetable Generator is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
-
 #include "batch.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -39,7 +35,6 @@ int add_batch(char *database, batch *xbatch) {
 	fclose(fp);
 	return 0;
 }
-
 int remove_batch(char *database, int index){
 	FILE *fp;
 	int n, i;
@@ -65,7 +60,6 @@ int remove_batch(char *database, int index){
 	fclose(fp);
 	return 0;
 }
-
 int edit_batch(char *database, int index, batch *xbatch){
 	FILE *fp;
 	int n, i;
@@ -92,7 +86,6 @@ int edit_batch(char *database, int index, batch *xbatch){
 	fclose(fp);
 	return 0;
 }
-
 batch get_batch(char *database, int index) {
 	FILE *fp;
 	int n = 0;
@@ -129,13 +122,7 @@ int batch_number(char *database) {
 	fclose(fp);
 	return n;
 }
-
-int *find_batch_info(char *database, int index){
-
-	return 0;
-}
 int sort_batch(char *database , int(*compare)(const void *x ,const void *y)){
-
 	return 0;
 }
 int show_batch_info(char *database, int choice) {
@@ -174,10 +161,10 @@ int show_batch_info(char *database, int choice) {
 	printw("Strength - %d",xbatch.strength);
 //	move(y/4 + 7,x/3 + 2);
 //	printw("Parent - %d",xbatch.parent);
-	mvwprintw(win,y - 2, 2,"B:Back\tQ:Quit");
+	mvwprintw(win,y - 2, 2,"A:Add ALlocation\t\tB:Back\tQ:Quit");
 	refresh();
 	while((c = wgetch(win))){
-		switch(c) {	
+		switch(c) {
 			case KEY_DOWN:
 			case KEY_UP:
 				return 0;
@@ -189,28 +176,27 @@ int show_batch_info(char *database, int choice) {
 			case 'q':
 				curs_set(1);
 				return INT_MIN;
+			case 'A':
+			case 'a':
+				curs_set(1);
+				return 2;
 			default:
 				break;
 		}
 	}
 	return 0;
 }
-
 int start_batch(char *database){
 	int choice, n, sub_choice;
 	while(1) {
 		choice = batch_menu(database);
 		n = batch_number(database);
-
 		if(choice == n + 1)
 			break;
-
 		else if(choice == n + 2)
 			batch_form(database);
-
 		else if(choice == INT_MIN)
 			return INT_MIN;
-
 		else if(choice == -1)
 			continue;
 		else {
@@ -220,12 +206,13 @@ int start_batch(char *database){
 					break;
 				if(sub_choice == INT_MIN)
 					return INT_MIN;
+				if(sub_choice == 2)
+					alloc_form_batch(database,choice);
 			}
 		}
 	}
 	return 0;
 }
-
 int batch_menu(char *database){
 	int i, c, n, choice = 0;
 	batch *xbatch;
@@ -263,7 +250,6 @@ int batch_menu(char *database){
 	mvwaddch(win, y - 3, x - 1, ACS_RTEE);
 	refresh();
 	if(n) {
-
 		if(n > 1)
 			mvwprintw(win,y - 2, 2,"N:New Batch\t\tR:Remove Batch\tS:Sort\t\tB:Back\tQ:Quit");
 		else
@@ -279,13 +265,11 @@ int batch_menu(char *database){
 					if(choice != n -1)
 						choice++;
 					break;
-
 				case KEY_UP:
 					menu_driver(menu, REQ_UP_ITEM);
 					if(choice != 0)
 						choice--;
 					break;
-
 				case 10: /* Enter */
 					remove_menu(menu,items,n);
 					return choice;
@@ -338,7 +322,6 @@ int batch_menu(char *database){
 				default:
 					break;
 			}
-
 			wrefresh(win);
 		}
 	}
@@ -388,7 +371,7 @@ int batch_form(char *database){
 	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
 	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
 	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);	
+	move(y/4 + 3,x/3 + 2);
 	scanw("%d",&xbatch.strength);
 	add_batch(database, &xbatch);
 	refresh();
