@@ -1,6 +1,5 @@
 language: c
-install: make get-dep
-        ./configure && make && make test
+install: make
 compiler:
         - clang
         - gcc
