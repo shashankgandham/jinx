@@ -10,12 +10,14 @@
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "teacher.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
 #include <limits.h>
+
 int add_teacher(char *database, teacher *xteacher) {
 	FILE *fp;
 	int n;
