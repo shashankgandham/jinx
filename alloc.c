@@ -100,7 +100,7 @@ alloc get_alloc(char *database, int index) {
 	strcat(file, database);
 	strcat(file, "_alloc");
 	fp = fopen(file,"r");
-	while(fscanf(fp,"%d %d %d %d %d",&xalloc.index, &xalloc.batch, &xalloc.subject, &xalloc.teacher,&xalloc.slot) != EOF) {
+	while(fscanf(fp,"%d %d %d %d %d",&xalloc.index, &xalloc.batch, &xalloc.subject, &xalloc.teacher, &xalloc.slot) != EOF) {
 		if(n == index)
 			break;
 		n++;
@@ -122,7 +122,7 @@ int alloc_number(char *database) {
 		fclose(fp);
 		return 0;
 	}
-	while(fscanf(fp,"%d %d %d %d %d",&xalloc.index, &xalloc.batch, &xalloc.subject, &xalloc.teacher, &xalloc.slot) != EOF)
+	while(fscanf(fp,"%d %d %d %d %d",&xalloc.index, &xalloc.batch, &xalloc.subject, &xalloc.teacher,&xalloc.slot) != EOF)
 		n++;
 	fclose(fp);
 	return n;
@@ -756,7 +756,7 @@ int alloc_form(char *database) {
 		n-=1;
 	}
 	xalloc.teacher = get_index(database, 2, n);
-	xalloc.slot = 1;
+	xalloc.slot = 0;	
 	add_alloc(database, &xalloc);
 	return 0;
 }
@@ -780,7 +780,6 @@ int alloc_form_teacher(char *database, int index) {
 	}
 	xalloc.subject = get_index(database, 1, n);
 	xalloc.teacher = get_index(database, 2, index);
-	xalloc.slot = 1;
 	add_alloc(database, &xalloc);
 	return 0;
 }
@@ -804,7 +803,6 @@ int alloc_form_subject(char *database, int index) {
 		n-=1;
 	}
 	xalloc.teacher = get_index(database, 2, n);
-	xalloc.slot = 1;
 	add_alloc(database, &xalloc);
 	return 0;
 }
@@ -828,7 +826,6 @@ int alloc_form_batch(char *database, int index) {
 		n-=1;
 	}
 	xalloc.teacher = get_index(database, 2, n);
-	xalloc.slot = 1;
 	add_alloc(database, &xalloc);
 	return 0;
 }

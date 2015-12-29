@@ -1,3 +1,3 @@
-![](https://travis-ci.org/shashankgandham/jinx.svg?branch=master)
+![](https://travis-ci.org/shashankgandham/xtimetable.svg?branch=master)
 
 # Timetable Maker

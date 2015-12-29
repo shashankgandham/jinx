@@ -4,14 +4,17 @@ personal : jinx
 	@echo "Lines Bytes Filename"
 	@wc -lc *.c *.h
 
-jinx: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o
-	@gcc -o jinx .batch.o .teacher.o .subject.o .room.o .alloc.o .database.o -lncurses -lgsl -lgslcblas -lmenu -g
+jinx: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o .timetable.o
+	@gcc -o jinx .batch.o .teacher.o .subject.o .room.o .alloc.o .database.o .timetable.o -lncurses -lgsl -lgslcblas -lmenu -g
 
 .teacher.o: teacher.c
 	@gcc -c -Wall teacher.c -o .teacher.o -g
 
 .batch.o: batch.c
 	@gcc -c -Wall batch.c -o .batch.o -g
+
+.timetable.o: timetable.c
+	@gcc -c -Wall timetable.c -o .timetable.o -g
 
 .subject.o: subject.c
 	@gcc -c -Wall subject.c -o .subject.o -g
