@@ -17,6 +17,8 @@ int new_database(char *name);
 void new_database_form();
 int show_database_menu(char *database);
 int database_menu(char *database);
+int scanstr(WINDOW *win, char *str, int len);
+void print_form(WINDOW *win, int y, int x);
 void get_database(int choice, char *choices);
 int database_number();
 int main_menu();

@@ -9,7 +9,7 @@
     GNU General Public License for more details.
     You should have received a copy of the GNU General Public License
     along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
-*/
+    */
 
 #include "teacher.h"
 #include <stdio.h>
@@ -333,7 +333,7 @@ int teacher_menu(char *database){
 int teacher_form(char *database){
 	refresh();
 	teacher xteacher;
-	echo();
+	noecho();
 	WINDOW *win;
 	int y,x;
 	start_color();
@@ -342,37 +342,13 @@ int teacher_form(char *database){
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Teacher", COLOR_PAIR(1));
-	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
-	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
-	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
-	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
-	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
-	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
-	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
-	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
-	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
-	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
-	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
-	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);
-	scanw(" %[^\n]s",xteacher.name);
+	print_form(win,y,x);
+	scanstr(win,xteacher.name, x/3 - 1);	
 	clear();
 	refresh();
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the weekly hours for the teacher", COLOR_PAIR(1));
-	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
-	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
-	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
-	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
-	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
-	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
-	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
-	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
-	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
-	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
-	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
-	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);
+	print_form(win, y, x);	
 	scanw("%d",&xteacher.week_time);
 	add_teacher(database, &xteacher);
 	refresh();

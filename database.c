@@ -24,6 +24,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <limits.h>
+#include <ctype.h>
 void remove_menu(MENU *menu, ITEM **items, int n) {
 	int i;
 	unpost_menu(menu);
@@ -53,6 +54,50 @@ void print_in_middle(WINDOW *win, int starty, int startx, int width, char *strin
 	mvwprintw(win, y, x, "%s", string);
 	wattroff(win, color);
 	refresh();
+}
+void print_form(WINDOW *win, int y, int x) {
+	mvwhline(win, y/4, x/3, ACS_HLINE, x/3 + 1);
+	mvwhline(win, y/4 + 2, x/3, ACS_HLINE, x/3 + 1);
+	mvwhline(win, y/4 + 5, x/3, ACS_HLINE, x/3 + 1);
+
+	mvwvline(win, y/4 + 1, x/3 , ACS_VLINE, 4);
+	mvwvline(win, y/4 + 1, 2*x/3, ACS_VLINE, 4);
+
+	mvwaddch(win, y/4, x/3 , ACS_ULCORNER);
+	mvwaddch(win, y/4, 2*x/3 , ACS_URCORNER);
+	
+	mvwaddch(win, y/4 + 5, x/3 , ACS_LLCORNER);
+	mvwaddch(win, y/4 + 5, 2*x/3 , ACS_LRCORNER);
+	
+	mvwaddch(win, y/4 + 2, 2*x/3 , ACS_RTEE);
+	mvwaddch(win, y/4 + 2, x/3 , ACS_LTEE);
+	move(y/4 + 3,x/3 + 1);
+	wrefresh(win);
+}
+int scanstr(WINDOW *win, char *str, int len) {
+	int i = 0, c, x, y;
+	getyx(win,y,x);
+	while((c = getch())) {
+		if(c == 10) {
+			str[i] = 0;
+			break;
+		}
+		else if((c == KEY_DC || c == KEY_BACKSPACE) && i){
+			move(y + 1,x + i - 1);
+			delch();
+			refresh();
+			i--;
+		}
+		else if(isalnum(c) || isspace(c) || ispunct(c)) {
+			if(i == len - 1)
+				continue;
+			str[i] = c;
+			printw("%c",str[i]);
+			refresh();
+			i++;
+		}
+	}
+	return 0;
 }
 int new_database(char *name) {
 	FILE *fp, *gp;
@@ -104,7 +149,7 @@ int remove_database(char *data) {
 void new_database_form() {
 	refresh();
 	char name[128];
-	echo();
+	noecho();
 	WINDOW *win;
 	int y,x;
 	start_color();
@@ -113,20 +158,8 @@ void new_database_form() {
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Database", COLOR_PAIR(1));
-	mvwhline(win, y/4, x/4, ACS_HLINE, x/2);
-	mvwhline(win, y/4 + 2, x/4, ACS_HLINE, x/2);
-	mvwhline(win, y/2, x/4, ACS_HLINE, x/2);
-	mvwvline(win, y/4 + 1, x/4 , ACS_VLINE, y/4 - 1);
-	mvwaddch(win, y/4, x/4 , ACS_ULCORNER);
-	mvwaddch(win, y/2, x/4 , ACS_LLCORNER);
-	mvwaddch(win, y/4, 3*x/4 , ACS_URCORNER);
-	mvwaddch(win, y/2, 3*x/4 , ACS_LRCORNER);
-	mvwvline(win, y/4 + 1, 3*x/4, ACS_VLINE, y/4 - 1);
-	mvwaddch(win, y/4 + 2, 3*x/4 , ACS_RTEE);
-	mvwaddch(win, y/4 + 2, x/4 , ACS_LTEE);
-	wrefresh(win);
-	move(y/4 + 3,x/3 + 2);
-	scanw(" %[^\n]s",name);
+	print_form(win,y,x);
+	scanstr(win,name, x/3 - 1);
 	new_database(name);
 	refresh();
 	endwin();

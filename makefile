@@ -1,11 +1,11 @@
 # Makefile for Timetable Generator by Shashank Gandham liscensed under GPLv2
-personal : jinx
+personal : xtimetable
 	@echo "The Program was compiled successfully and its details are :"
 	@echo "Lines Bytes Filename"
 	@wc -lc *.c *.h
 
-jinx: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o .timetable.o
-	@gcc -o jinx .batch.o .teacher.o .subject.o .room.o .alloc.o .database.o .timetable.o -lncurses -lgsl -lgslcblas -lmenu -g
+xtimetable: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o .timetable.o
+	@gcc -o xtimetable .batch.o .teacher.o .subject.o .room.o .alloc.o .database.o .timetable.o -lncurses -lgsl -lgslcblas -lmenu -g
 
 .teacher.o: teacher.c
 	@gcc -c -Wall teacher.c -o .teacher.o -g
