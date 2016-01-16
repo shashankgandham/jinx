@@ -1,21 +1,11 @@
-/*  This file is part of Jinx originally written by Shashank gandham.
-    Timetable Generator is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
-    Timetable Generator is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
-    */
-#include "teacher.h"
-#include "subject.h"
-#include "batch.h"
-#include "room.h"
-#include "timetable.h"
-#include "alloc.h"
+/*    
+    This file is part of Xtimetable originally written by Shashank Gandham. Xtimetable is free software: you can redistribute it and/or 
+    modifyvit under the terms of the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, 
+    or (at your option) any later version.Xtimetable is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more 
+    details. You should have received a copy of the GNU General Public License along with Xtimetable.  If not, see <http://www.gnu.org/licenses/>.
+*/
+#include "library.h"
 #include <stdio.h>
 #include <string.h>
 #include <menu.h>
@@ -24,81 +14,7 @@
 #include <sys/types.h>
 #include <signal.h>
 #include <limits.h>
-#include <ctype.h>
-void remove_menu(MENU *menu, ITEM **items, int n) {
-	int i;
-	unpost_menu(menu);
-	free_menu(menu);
-	for(i = 0; i < n; ++i)
-		free_item(items[i]);
-	endwin();
-	clear();
-	refresh();
-}
-void print_in_middle(WINDOW *win, int starty, int startx, int width, char *string, chtype color) {
-	int length, x, y;
-	float temp;
-	if(win == NULL)
-		win = stdscr;
-	getyx(win, y, x);
-	if(startx != 0)
-		x = startx;
-	if(starty != 0)
-		y = starty;
-	if(width == 0)
-		width = 80;
-	length = strlen(string);
-	temp = (width - length)/ 2;
-	x = startx + (int)temp;
-	wattron(win, color);
-	mvwprintw(win, y, x, "%s", string);
-	wattroff(win, color);
-	refresh();
-}
-void print_form(WINDOW *win, int y, int x) {
-	mvwhline(win, y/4, x/3, ACS_HLINE, x/3 + 1);
-	mvwhline(win, y/4 + 2, x/3, ACS_HLINE, x/3 + 1);
-	mvwhline(win, y/4 + 5, x/3, ACS_HLINE, x/3 + 1);
 
-	mvwvline(win, y/4 + 1, x/3 , ACS_VLINE, 4);
-	mvwvline(win, y/4 + 1, 2*x/3, ACS_VLINE, 4);
-
-	mvwaddch(win, y/4, x/3 , ACS_ULCORNER);
-	mvwaddch(win, y/4, 2*x/3 , ACS_URCORNER);
-	
-	mvwaddch(win, y/4 + 5, x/3 , ACS_LLCORNER);
-	mvwaddch(win, y/4 + 5, 2*x/3 , ACS_LRCORNER);
-	
-	mvwaddch(win, y/4 + 2, 2*x/3 , ACS_RTEE);
-	mvwaddch(win, y/4 + 2, x/3 , ACS_LTEE);
-	move(y/4 + 3,x/3 + 1);
-	wrefresh(win);
-}
-int scanstr(WINDOW *win, char *str, int len) {
-	int i = 0, c, x, y;
-	getyx(win,y,x);
-	while((c = getch())) {
-		if(c == 10) {
-			str[i] = 0;
-			break;
-		}
-		else if((c == KEY_DC || c == KEY_BACKSPACE) && i){
-			move(y + 1,x + i - 1);
-			delch();
-			refresh();
-			i--;
-		}
-		else if(isalnum(c) || isspace(c) || ispunct(c)) {
-			if(i == len - 1)
-				continue;
-			str[i] = c;
-			printw("%c",str[i]);
-			refresh();
-			i++;
-		}
-	}
-	return 0;
-}
 int new_database(char *name) {
 	FILE *fp, *gp;
 	char database[128];
@@ -158,7 +74,7 @@ void new_database_form() {
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Database", COLOR_PAIR(1));
-	print_form(win,y,x);
+	print_form_str(win,y,x);
 	scanstr(win,name, x/3 - 1);
 	new_database(name);
 	refresh();

@@ -1,16 +1,11 @@
-/*  This file is part of Jinx originally written by Shashank gandham.
-    Timetable Generator is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
-    Timetable Generator is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
+/*    
+    This file is part of Xtimetable originally written by Shashank Gandham. Xtimetable is free software: you can redistribute it and/or 
+    modifyvit under the terms of the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, 
+    or (at your option) any later version.Xtimetable is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more 
+    details. You should have received a copy of the GNU General Public License along with Xtimetable.  If not, see <http://www.gnu.org/licenses/>.
 */
-#include "batch.h"
+#include "library.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -331,7 +326,7 @@ int batch_menu(char *database){
 int batch_form(char *database){
 	refresh();
 	batch xbatch;
-	echo();
+	noecho();
 	WINDOW *win;
 	int y,x;
 	start_color();
@@ -340,15 +335,15 @@ int batch_form(char *database){
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Batch", COLOR_PAIR(1));
-	print_form(win, y,x);	
+	print_form_str(win, y,x);	
 	scanstr(win,xbatch.name,x/3 - 1);
 	clear();
 	refresh();
 	xbatch.parent = -1;
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the strength of the batch", COLOR_PAIR(1));
-	print_form(win, y,x);	
-	scanw("%d",&xbatch.strength);
+	print_form_str(win, y,x);	
+	xbatch.strength = scanint(win);
 	add_batch(database, &xbatch);
 	refresh();
 	endwin();

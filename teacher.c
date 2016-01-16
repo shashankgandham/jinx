@@ -1,17 +1,11 @@
-/*  This file is part of Jinx originally written by Shashank gandham.
-    Timetable Generator is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 2 of the License, or
-    (at your option) any later version.
-    Timetable Generator is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License
-    along with Jinx.  If not, see <http://www.gnu.org/licenses/>.
-    */
-
-#include "teacher.h"
+/*    
+    This file is part of Xtimetable originally written by Shashank Gandham. Xtimetable is free software: you can redistribute it and/or 
+    modifyvit under the terms of the GNU General Public License as published by the Free Software Foundation, either version 2 of the License, 
+    or (at your option) any later version.Xtimetable is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; 
+    without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more 
+    details. You should have received a copy of the GNU General Public License along with Xtimetable.  If not, see <http://www.gnu.org/licenses/>.
+*/
+#include "library.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -342,14 +336,14 @@ int teacher_form(char *database){
 	init_pair(1, COLOR_RED, COLOR_BLACK);
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the Name of Teacher", COLOR_PAIR(1));
-	print_form(win,y,x);
+	print_form_str(win,y,x);
 	scanstr(win,xteacher.name, x/3 - 1);	
 	clear();
 	refresh();
 	box(win, 0, 0);
 	print_in_middle(win, y/4 + 1, 0, x, "Enter the weekly hours for the teacher", COLOR_PAIR(1));
-	print_form(win, y, x);	
-	scanw("%d",&xteacher.week_time);
+	print_form_int(win, y, x);	
+	xteacher.week_time = scanint(win);
 	add_teacher(database, &xteacher);
 	refresh();
 	endwin();
