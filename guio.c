@@ -5,10 +5,12 @@
     without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more 
     details. You should have received a copy of the GNU General Public License along with Xtimetable.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 #include "library.h"
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+
 void remove_menu(MENU *menu, ITEM **items, int n) {
 	int i;
 	unpost_menu(menu);

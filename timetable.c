@@ -20,7 +20,6 @@ int generate(char *database) {
 		xalloc[i] = get_alloc(database,i);
 	return 0;
 }
-
 int timetable_menu(char *database) {
 	int i, c;
 	int n = 4;
