@@ -54,6 +54,7 @@ int scanstr(WINDOW *win, char *str, int len);
 int scanint(WINDOW *win);
 void print_form_str(WINDOW *win, int y, int x);
 void print_form_int(WINDOW *win, int y, int x);
+
 //DATABASE
 int new_database(char *name);
 void new_database_form();

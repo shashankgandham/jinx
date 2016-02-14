@@ -219,6 +219,8 @@ int start_alloc(char *database){
 int alloc_menu(char *database){
 	int i, c, n, choice = 0;
 	alloc xalloc;
+	batch xbatch;
+	subject xsubject;
 	char **choices, **description;
 	WINDOW *win;
 	ITEM **items;
@@ -236,8 +238,10 @@ int alloc_menu(char *database){
 		description[i] = (char *)malloc(sizeof(char) * 128);
 		if(i) {
 			xalloc = get_alloc(database,i - 1);
-			strcpy(choices[i],get_batch(database, get_array_index(database, 0, xalloc.batch)).name);
-			strcpy(description[i],get_subject(database, get_array_index(database, 1, xalloc.subject)).name);
+			xbatch = get_batch(database, get_array_index(database, 0, xalloc.batch));
+			strcpy(choices[i],xbatch.name);
+			xsubject = get_subject(database, get_array_index(database, 1, xalloc.subject));
+			strcpy(description[i],xsubject.name);
 		}
 		else {
 			strcpy(choices[i],"Batch");
