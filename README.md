@@ -1,1 +1,1 @@
-#			Timetable Maker (Xtimetable)
+#			Timetable Maker (xTimetable)
