@@ -1,4 +1,5 @@
-# Makefile for xtimetable by Shashank Gandham liscensed under GPLv2
+# MIT LICENSE Copyright (c) 2016 Shashank Gandham
+
 
 personal : xtimetable
 	@echo "The Program was compiled successfully and its details are :"
@@ -31,5 +32,7 @@ xtimetable: .teacher.o .batch.o .subject.o .room.o .alloc.o .database.o .timetab
 
 .database.o: database.c
 	@gcc -c -Wall database.c -o .database.o -g
+
 clean:
 	rm .*.o
+	rm .*.swp
