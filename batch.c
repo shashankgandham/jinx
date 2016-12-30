@@ -28,6 +28,7 @@ int add_batch(char *database, batch *xbatch) {
 	fclose(fp);
 	return 0;
 }
+
 int remove_batch(char *database, int index){
 	FILE *fp;
 	int n, i;
